@@ -21,7 +21,7 @@ CREATE TABLE ambiente.municipio (
     id INT,
     nome VARCHAR(100),
     id_estado INT,
-    CONSTRAINT pk_municipio PRIMARY KEY(codigo),
+    CONSTRAINT pk_municipio PRIMARY KEY(id),
     CONSTRAINT fk_municipio_estado FOREIGN KEY(id_estado)
         REFERENCES ambiente.estado(id)
 );
@@ -32,7 +32,7 @@ CREATE TABLE ambiente.estacao_metereologica (
     id_municipio INT,
     CONSTRAINT pk_estacoes_metereologicas PRIMARY KEY(codigo),
     CONSTRAINT fk_estacoes_metereologicas_municipio FOREIGN KEY(id_municipio)
-        REFERENCES ambiente.municipio(codigo)
+        REFERENCES ambiente.municipio(id)
 );
 
 CREATE TABLE ambiente.medicao_clima (
@@ -52,7 +52,7 @@ CREATE TABLE ambiente.area_geografica (
     id_municipio INT,
     CONSTRAINT pk_area_geografica PRIMARY KEY(id),
     CONSTRAINT fk_area_geografica_municipio FOREIGN KEY(id_municipio)
-        REFERENCES ambiente.municipio(codigo)
+        REFERENCES ambiente.municipio(id)
 );
 
 CREATE TABLE ambiente.floresta (
