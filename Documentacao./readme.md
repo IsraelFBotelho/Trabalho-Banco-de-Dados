@@ -14,7 +14,7 @@ Nessa primeira iremos pegar dados sobre cada cidade e criar gráficos de desmata
 
 ### Tabela 2 (Temperatura)
 
-A tabela 2 vem direto do Banco de Dados Meteorológicos do INMET, banco do INMET, Instituto Nascional de Meterologia.
+A tabela 2 vem direto do Banco de Dados Meteorológicos do INMET, Instituto Nacional de Meterologia.
 
 Nessa tabela vamos comparar a temperatura em cidades selecionadas previamente que tanham uma estação de metereologia. Iremos criar gráficos da variação da temperatura por ano.
 
