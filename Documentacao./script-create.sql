@@ -63,10 +63,9 @@ CREATE TABLE ambiente.floresta (
 );
 
 CREATE TABLE ambiente.desmatamento (
-    id INT AUTO_INCREMENT,
     taxa_incremento FLOAT,
     area_desmatada FLOAT,
     id_floresta INT,
     CONSTRAINT fk_desmatamento_floresta FOREIGN KEY(id_floresta) REFERENCES ambiente.floresta(id),
-    CONSTRAINT pk_desmatamento PRIMARY KEY(id, id_floresta)
+    CONSTRAINT pk_desmatamento PRIMARY KEY(id_floresta)
 );
