@@ -22,6 +22,11 @@ import java.util.*;
 @RequestScoped
 public class UploadController {
 
+    private String type;
+    private List<Map<String,String>> csv;
+    private UploadedFile file;
+    private UploadedFiles files;
+    private String dropZoneText = "Drop zone p:inputTextarea demo.";
     public List<Map<String,String>> getCsv() {
         return csv;
     }
@@ -29,11 +34,6 @@ public class UploadController {
     public void setCsv(List<Map<String,String>> csv) {
         this.csv = csv;
     }
-
-    private List<Map<String,String>> csv;
-    private UploadedFile file;
-    private UploadedFiles files;
-    private String dropZoneText = "Drop zone p:inputTextarea demo.";
 
     public void treatCsv(){
         try {
@@ -46,14 +46,21 @@ public class UploadController {
             this.csv = new ArrayList<Map<String,String>>();
 
             String[] headers = csvReader.readNext();
-            String[] colunas = null;
 
-            while ((colunas = csvReader.readNext()) != null) {
+            if(headers.length == 2){
+                this.type = "clima";
+            }else{
+                this.type = "desmatamento";
+            }
+
+            String[] columns = null;
+
+            while ((columns = csvReader.readNext()) != null) {
 
                 Map<String, String> campos = new HashMap<String, String>();
 
-                for(int i = 0; i < colunas.length; i++){
-                    campos.put(headers[i], colunas[i]);
+                for(int i = 0; i < columns.length; i++){
+                    campos.put(headers[i], columns[i]);
                 }
                 this.csv.add(campos);
             }

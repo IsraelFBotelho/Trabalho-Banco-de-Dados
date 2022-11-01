@@ -34,24 +34,19 @@
                          rendered="#{not empty uploadController.csv}" >
 
                 <p:column headerText="====">
-                    <h:outputText id="nomeInput" value="#{produto.get('SUBSTANCIA')}"/>
+                    <h:outputText id="nomeInput" value="#{produto.get(0)}"/>
                 </p:column>
 
-                <p:column headerText="====">
-                    <h:outputText id="precoInput" value="#{produto.get('REGISTRO')}">
+                <p:column headerText="====" >
+                    <h:outputText id="precoInput" value="#{produto.get(1)}">
                         <f:convertNumber type="currency" currencySymbol="R$" locale="pt_BR" />
                     </h:outputText>
                 </p:column>
 
                 <p:column headerText="====">
-                    <h:outputText id="quantidadeInput" value="#{produto.get('EAN 1')}"/>
+                    <h:outputText id="quantidadeInput" value="#{produto.get(2)}"/>
                 </p:column>
 
-<!--                <p:column>-->
-<!--                    <p:commandButton update="produtos:growl" value="Adicionar ao Carrinho"-->
-<!--                                     action="#{produtoSessaoController.postSession(produto)}">-->
-<!--                    </p:commandButton>-->
-<!--                </p:column>-->
             </p:dataTable>
         </div>
 
