@@ -1,14 +1,15 @@
+DROP SCHEMA IF EXISTS ambiente;
 CREATE SCHEMA ambiente;
 
 CREATE TABLE ambiente.regiao (
-    id INT AUTO_INCREMENT,
+    id SERIAL,
     nome VARCHAR(25),
     CONSTRAINT pk_regiao PRIMARY KEY(id),
     CONSTRAINT uk_regiao_nome UNIQUE(nome)
 );
 
 CREATE TABLE ambiente.estado (
-    id INT AUTO_INCREMENT,
+    id SERIAL,
     sigla VARCHAR(2),
     nome VARCHAR(50),
     id_regiao INT,
@@ -18,7 +19,7 @@ CREATE TABLE ambiente.estado (
 );
 
 CREATE TABLE ambiente.municipio (
-    id INT AUTO_INCREMENT,
+    id SERIAL,
     nome VARCHAR(100),
     id_estado INT,
     CONSTRAINT pk_municipio PRIMARY KEY(id),
@@ -45,7 +46,7 @@ CREATE TABLE ambiente.medicao_clima (
 );
 
 CREATE TABLE ambiente.area_geografica (
-    id INT AUTO_INCREMENT,
+    id SERIAL,
     area_total FLOAT,
     id_municipio INT,
     CONSTRAINT pk_area_geografica PRIMARY KEY(id),
@@ -53,7 +54,7 @@ CREATE TABLE ambiente.area_geografica (
 );
 
 CREATE TABLE ambiente.floresta (
-    id INT AUTO_INCREMENT,
+    id SERIAL,
     area_floresta FLOAT,
     area_nao_floresta FLOAT,
     ano INT,
