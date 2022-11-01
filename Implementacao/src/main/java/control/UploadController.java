@@ -1,6 +1,7 @@
 package control;
 
 import com.opencsv.CSVReader;
+import jdbc.PgConnectionFactory;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.FilesUploadEvent;
@@ -14,7 +15,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.*;
 
 @Named
@@ -36,6 +39,17 @@ public class UploadController {
     }
 
     public void treatCsv(){
+        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
+        try {
+            pgConnectionFactory.getConnetion();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         try {
 
 
