@@ -36,7 +36,7 @@ public class PgConnectionFactory extends ConnectionFactory {
     }
 
     @Override
-    public Connection getConnetion() throws IOException, SQLException, ClassNotFoundException {
+    public Connection getConnection() throws IOException, SQLException, ClassNotFoundException {
         String className = "org.postgresql.Driver";
         Connection connection = null;
 

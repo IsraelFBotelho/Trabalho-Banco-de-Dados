@@ -26,22 +26,23 @@ import java.util.*;
 public class UploadController {
 
     private String type;
-    private List<Map<String,String>> csv;
+    private List<Map<String, String>> csv;
     private UploadedFile file;
     private UploadedFiles files;
     private String dropZoneText = "Drop zone p:inputTextarea demo.";
-    public List<Map<String,String>> getCsv() {
+
+    public List<Map<String, String>> getCsv() {
         return csv;
     }
 
-    public void setCsv(List<Map<String,String>> csv) {
+    public void setCsv(List<Map<String, String>> csv) {
         this.csv = csv;
     }
 
-    public void treatCsv(){
+    public void treatCsv() {
         PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
         try {
-            pgConnectionFactory.getConnetion();
+            pgConnectionFactory.getConnection();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {
@@ -51,36 +52,32 @@ public class UploadController {
         }
 
         try {
-
-
             CSVReader csvReader = new CSVReader(
                     new InputStreamReader(
                             new ByteArrayInputStream(file.getContent())), ';');
 
-            this.csv = new ArrayList<Map<String,String>>();
+            this.csv = new ArrayList<Map<String, String>>();
 
             String[] headers = csvReader.readNext();
 
-            if(headers.length == 2){
+            if (headers.length == 2) {
                 this.type = "clima";
-            }else{
+            } else {
                 this.type = "desmatamento";
             }
 
             String[] columns = null;
 
             while ((columns = csvReader.readNext()) != null) {
-
                 Map<String, String> campos = new HashMap<String, String>();
 
-                for(int i = 0; i < columns.length; i++){
+                for (int i = 0; i < columns.length; i++) {
                     campos.put(headers[i], columns[i]);
                 }
+
                 this.csv.add(campos);
             }
-
-        }
-        catch (Exception e ){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

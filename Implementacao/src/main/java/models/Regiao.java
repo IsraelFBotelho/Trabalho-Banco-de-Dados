@@ -19,4 +19,36 @@ public class Regiao {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    public void setNomeByAcronym(String acronym) {
+        switch (acronym) {
+            case "CO": {
+                this.nome = "CENTRO-OESTE";
+                break;
+            }
+
+            case "N": {
+                this.nome = "NORTE";
+                break;
+            }
+
+            case "S": {
+                this.nome = "SUL";
+                break;
+            }
+
+            case "NE": {
+                this.nome = "NORDESTE";
+                break;
+            }
+
+            case "SE": {
+                this.nome = "SUDESTE";
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
 }
