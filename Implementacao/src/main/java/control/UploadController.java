@@ -41,13 +41,10 @@ public class UploadController {
 
     public void treatCsv() {
         PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
+
         try {
             pgConnectionFactory.getConnection();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
