@@ -1,7 +1,9 @@
 package control;
 
 import com.opencsv.CSVReader;
+import dao.RegiaoDAO;
 import jdbc.PgConnectionFactory;
+import models.Regiao;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.FilesUploadEvent;
@@ -40,13 +42,23 @@ public class UploadController {
     }
 
     public void treatCsv() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
+        RegiaoDAO regiaoDao = new RegiaoDAO();
+        List<Regiao> regions = new ArrayList<>();
 
-        try {
-            pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        Regiao a = new Regiao();
+        a.setNomeByAcronym("S");
+
+        Regiao b = new Regiao();
+        b.setNomeByAcronym("Erro");
+
+        Regiao c = new Regiao();
+        c.setNomeByAcronym("NE");
+
+        regions.add(a);
+        regions.add(b);
+        regions.add(c);
+
+        regiaoDao.create(regions);
 
         try {
             CSVReader csvReader = new CSVReader(

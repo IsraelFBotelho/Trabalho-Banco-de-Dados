@@ -32,8 +32,10 @@ public class RegiaoDAO implements DAO<Regiao> {
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Regiao e : models) {
-                statement.setString(1, e.getNome());
-                statement.execute();
+                if (e.getNome() != null) {
+                    statement.setString(1, e.getNome());
+                    statement.execute();
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
