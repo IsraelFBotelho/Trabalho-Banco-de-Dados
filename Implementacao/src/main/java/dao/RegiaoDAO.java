@@ -1,4 +1,4 @@
-package services;
+package dao;
 
 import interfaces.DAO;
 import jdbc.PgConnectionFactory;
@@ -12,10 +12,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RegiaoService implements DAO<Regiao> {
+public class RegiaoDAO implements DAO<Regiao> {
     private Connection connection = null;
 
-    public RegiaoService() {
+    public RegiaoDAO() {
         PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
 
         try {
