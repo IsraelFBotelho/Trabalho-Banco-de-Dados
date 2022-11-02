@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public abstract class ConnectionFactory {
     private static ConnectionFactory instance = null;
-    protected static String propertiesPath = "";
+    protected static String propertiesPath = "../../conf/datasource.properties";
     private static String dbServer;
 
     protected ConnectionFactory() {
@@ -42,5 +42,5 @@ public abstract class ConnectionFactory {
         return dbServer;
     }
 
-    public abstract Connection getConnetion() throws IOException, SQLException, ClassNotFoundException;
+    public abstract Connection getConnection() throws IOException, SQLException, ClassNotFoundException;
 }

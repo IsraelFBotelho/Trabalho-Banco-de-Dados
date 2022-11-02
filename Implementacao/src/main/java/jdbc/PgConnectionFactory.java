@@ -10,7 +10,7 @@ import java.util.Properties;
 public class PgConnectionFactory extends ConnectionFactory {
     private String dbHost;
     private String dbPort;
-    private String dbName;
+    private String dbDatabase;
     private String dbUser;
     private String dbPassword;
 
@@ -26,7 +26,7 @@ public class PgConnectionFactory extends ConnectionFactory {
             properties.load(input);
             dbHost = properties.getProperty("host");
             dbPort = properties.getProperty("port");
-            dbName = properties.getProperty("name");
+            dbDatabase = properties.getProperty("database");
             dbUser = properties.getProperty("user");
             dbPassword = properties.getProperty("password");
         } catch (IOException e) {
@@ -36,7 +36,7 @@ public class PgConnectionFactory extends ConnectionFactory {
     }
 
     @Override
-    public Connection getConnetion() throws IOException, SQLException, ClassNotFoundException {
+    public Connection getConnection() throws IOException, SQLException, ClassNotFoundException {
         String className = "org.postgresql.Driver";
         Connection connection = null;
 
@@ -44,7 +44,7 @@ public class PgConnectionFactory extends ConnectionFactory {
             Class.forName(className);
             readProperties();
 
-            String url = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
+            String url = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbDatabase;
             connection = DriverManager.getConnection(url, dbUser, dbPassword);
         } catch (ClassNotFoundException e) {
             System.err.println(e.getMessage());
