@@ -4,25 +4,25 @@ import java.sql.Time;
 import java.util.Date;
 
 public class MedicaoClima {
-    private Date dt;
-    private Time hora;
+    private java.sql.Date dt;
+    private java.sql.Time hora;
     private String codigoEstacaoMetereologica;
     private float temperaturaMinima;
     private float temperaturaMaxima;
 
-    public Date getDt() {
+    public java.sql.Date getDt() {
         return dt;
     }
 
-    public void setDt(Date dt) {
+    public void setDt(java.sql.Date dt) {
         this.dt = dt;
     }
 
-    public Time getHora() {
+    public java.sql.Time getHora() {
         return hora;
     }
 
-    public void setHora(Time hora) {
+    public void setHora(java.sql.Time hora) {
         this.hora = hora;
     }
 

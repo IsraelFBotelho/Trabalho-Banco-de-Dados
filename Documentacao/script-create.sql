@@ -14,7 +14,7 @@ CREATE TABLE ambiente.estado (
     nome VARCHAR(50),
     id_regiao INT,
     CONSTRAINT pk_estado PRIMARY KEY(id),
-    CONSTRAINT uk_estado_sigla_nome UNIQUE (sigla,nome),
+    CONSTRAINT uk_estado_sigla_nome UNIQUE (sigla, nome),
     CONSTRAINT fk_estado_regiao FOREIGN KEY(id_regiao) REFERENCES ambiente.regiao(id)
 );
 
