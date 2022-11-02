@@ -47,8 +47,10 @@ public class Regiao {
                 break;
             }
 
-            default:
+            default: {
+                this.nome = null;
                 break;
+            }
         }
     }
 }

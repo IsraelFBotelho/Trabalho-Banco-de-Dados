@@ -1,17 +1,17 @@
-DROP SCHEMA IF EXISTS ambiente;
+DROP SCHEMA IF EXISTS ambiente CASCADE;
 CREATE SCHEMA ambiente;
 
 CREATE TABLE ambiente.regiao (
     id SERIAL,
-    nome VARCHAR(25),
+    nome VARCHAR(25) NOT NULL,
     CONSTRAINT pk_regiao PRIMARY KEY(id),
     CONSTRAINT uk_regiao_nome UNIQUE(nome)
 );
 
 CREATE TABLE ambiente.estado (
     id SERIAL,
-    sigla VARCHAR(2),
-    nome VARCHAR(50),
+    sigla VARCHAR(2) NOT NULL,
+    nome VARCHAR(50) NOT NULL,
     id_regiao INT,
     CONSTRAINT pk_estado PRIMARY KEY(id),
     CONSTRAINT uk_estado_sigla_nome UNIQUE (sigla, nome),
@@ -20,7 +20,7 @@ CREATE TABLE ambiente.estado (
 
 CREATE TABLE ambiente.municipio (
     id SERIAL,
-    nome VARCHAR(100),
+    nome VARCHAR(100) NOT NULL,
     id_estado INT,
     CONSTRAINT pk_municipio PRIMARY KEY(id),
     CONSTRAINT uk_municipio_nome UNIQUE(nome),
@@ -29,20 +29,20 @@ CREATE TABLE ambiente.municipio (
 
 CREATE TABLE ambiente.estacao_metereologica (
     codigo VARCHAR(50),
-    nome VARCHAR(100),
+    nome VARCHAR(100) NOT NULL,
     id_municipio INT,
     CONSTRAINT pk_estacoes_metereologicas PRIMARY KEY(codigo),
     CONSTRAINT fk_estacoes_metereologicas_municipio FOREIGN KEY(id_municipio) REFERENCES ambiente.municipio(id)
 );
 
 CREATE TABLE ambiente.medicao_clima (
-    dt DATE,
+    data DATE,
     hora TIME,
     codigo_estacao_metereologica VARCHAR(100),
     temperatura_minina FLOAT,
     temperatura_maxima FLOAT,
     CONSTRAINT fk_medicoes_clima_estacao_metereologica FOREIGN KEY(codigo_estacao_metereologica) REFERENCES ambiente.estacao_metereologica(codigo),
-    CONSTRAINT pk_medicoes_clima PRIMARY KEY(codigo_estacao_metereologica, dt, hora)
+    CONSTRAINT pk_medicoes_clima PRIMARY KEY(codigo_estacao_metereologica, data, hora)
 );
 
 CREATE TABLE ambiente.area_geografica (
