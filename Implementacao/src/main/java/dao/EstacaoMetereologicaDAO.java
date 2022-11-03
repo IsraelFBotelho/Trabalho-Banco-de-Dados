@@ -28,13 +28,16 @@ public class EstacaoMetereologicaDAO implements DAO<EstacaoMetereologica> {
     @Override
     public void create(List<EstacaoMetereologica> models) {
         try {
-            String SQL = "INSERT INTO ambiente.estacao_metereologica (codigo, nome, id_municipio) VALUES (?, ?, ?);";
+            String SQL = "INSERT INTO ambiente.estacao_metereologica (codigo, nome, id_municipio) VALUES (?, ?, ?) " +
+                    "ON CONFLICT (codigo) DO UPDATE SET nome = ?, id_municipio = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (EstacaoMetereologica e : models) {
                 statement.setString(1, e.getCodigo());
                 statement.setString(2, e.getNome());
                 statement.setInt(3, e.getIdMunicipio());
+                statement.setString(4, e.getNome());
+                statement.setInt(5, e.getIdMunicipio());
                 statement.execute();
             }
         } catch (SQLException e) {

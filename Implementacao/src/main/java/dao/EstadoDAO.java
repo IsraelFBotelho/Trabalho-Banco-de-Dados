@@ -28,7 +28,8 @@ public class EstadoDAO implements DAO<Estado> {
     @Override
     public void create(List<Estado> models) {
         try {
-            String SQL = "INSERT INTO ambiente.estado (sigla, nome, id_regiao) VALUES (?, ?, ?) ON CONFLICT (sigla, nome) DO NOTHING;";
+            String SQL = "INSERT INTO ambiente.estado (sigla, nome, id_regiao) VALUES (?, ?, ?) " +
+                    "ON CONFLICT (sigla, nome, id_regiao) DO NOTHING;";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Estado e : models) {
