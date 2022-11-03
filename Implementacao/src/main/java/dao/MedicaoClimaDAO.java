@@ -28,8 +28,9 @@ public class MedicaoClimaDAO implements DAO<MedicaoClima> {
     @Override
     public void create(List<MedicaoClima> models) {
         try {
-            String SQL = "INSERT INTO ambiente.medicao_clima (dt, hora, codigo_estacao_metereologica, temperatura_minima, temperatura_maxima)" +
-                    "VALUES (?, ?, ?, ?, ?) ON CONFLICT (dt, hora, codigo_estacao_metereologica) DO NOTHING;";
+            String SQL = "INSERT INTO ambiente.medicao_clima (data, hora, codigo_estacao_metereologica, temperatura_minima, temperatura_maxima)" +
+                    "VALUES (?, ?, ?, ?, ?) ON CONFLICT (data, hora, codigo_estacao_metereologica) " +
+                    "DO UPDATE SET temperatura_minima = ?, temperatura_maxima = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (MedicaoClima e : models) {
@@ -38,6 +39,8 @@ public class MedicaoClimaDAO implements DAO<MedicaoClima> {
                 statement.setString(3, e.getCodigoEstacaoMetereologica());
                 statement.setFloat(4, e.getTemperaturaMinima());
                 statement.setFloat(5, e.getTemperaturaMaxima());
+                statement.setFloat(6, e.getTemperaturaMinima());
+                statement.setFloat(7, e.getTemperaturaMaxima());
                 statement.execute();
             }
         } catch (SQLException e) {

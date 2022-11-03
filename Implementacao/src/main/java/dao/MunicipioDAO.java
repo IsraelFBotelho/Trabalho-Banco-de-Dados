@@ -28,12 +28,14 @@ public class MunicipioDAO implements DAO<Municipio> {
     @Override
     public void create(List<Municipio> models) {
         try {
-            String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) VALUES (?, ?) ON CONFLICT (nome) DO NOTHING;";
+            String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) VALUES (?, ?) " +
+                    "ON CONFLICT (nome) DO UPDATE SET id_estado = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Municipio e : models) {
                 statement.setString(1, e.getNome());
                 statement.setInt(2, e.getIdEstado());
+                statement.setInt(3, e.getIdEstado());
                 statement.execute();
             }
         } catch (SQLException e) {

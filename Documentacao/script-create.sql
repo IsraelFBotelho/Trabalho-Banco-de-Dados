@@ -14,7 +14,8 @@ CREATE TABLE ambiente.estado (
     nome VARCHAR(50) NOT NULL,
     id_regiao INT,
     CONSTRAINT pk_estado PRIMARY KEY(id),
-    CONSTRAINT uk_estado_sigla_nome UNIQUE (sigla, nome),
+    CONSTRAINT uk_estado_sigla UNIQUE (sigla),
+    CONSTRAINT uk_estado_nome UNIQUE (nome),
     CONSTRAINT fk_estado_regiao FOREIGN KEY(id_regiao) REFERENCES ambiente.regiao(id)
 );
 
@@ -39,7 +40,7 @@ CREATE TABLE ambiente.medicao_clima (
     data DATE,
     hora TIME,
     codigo_estacao_metereologica VARCHAR(100),
-    temperatura_minina FLOAT,
+    temperatura_minima FLOAT,
     temperatura_maxima FLOAT,
     CONSTRAINT fk_medicoes_clima_estacao_metereologica FOREIGN KEY(codigo_estacao_metereologica) REFERENCES ambiente.estacao_metereologica(codigo),
     CONSTRAINT pk_medicoes_clima PRIMARY KEY(codigo_estacao_metereologica, data, hora)
@@ -60,6 +61,7 @@ CREATE TABLE ambiente.floresta (
     ano INT,
     id_area_geografica INT,
     CONSTRAINT pk_floresta PRIMARY KEY(id),
+    CONSTRAINT uk_floresta_ano UNIQUE(ano),
     CONSTRAINT fk_floresta_area_geografica FOREIGN KEY(id_area_geografica) REFERENCES ambiente.area_geografica(id)
 );
 
