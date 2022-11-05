@@ -1,0 +1,50 @@
+@font-face {
+    font-family: 'Montserrat';
+    src: url(font/Montserrat-Medium.ttf) format("truetype");
+
+}
+@font-face {
+    font-family: 'Bebas';
+    src: url(font/BebasNeue-Regular.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: 'Montserrat2';
+    src: url(font/Montserrat-Bold.ttf) format("truetype");
+}
+
+.text{
+    font-family: Montserrat, sans-serif;
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1{
+    font-family: Bebas, sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    align-self: center;
+}
+
+h2{
+    font-family: Montserrat2, sans-serif;
+    font-weight: normal;
+    font-size: large;
+    font-style: normal;
+}
+
+.backTitle1 {
+    height: 50px;
+    width: 40%;
+    /*background-color: darkgray;*/
+    justify-content: center;
+    text-align: center;
+}
+
+.screen {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+
+}
