@@ -1,0 +1,35 @@
+<ui:composition
+        template="./index.xhtml"
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="pagina">
+
+        #{historicoController.get()}
+
+        <div class="card" style="">
+            <p:growl id="growl" />
+            <p:dataTable id="tabelaProdutos" var="produto"
+                         value="#{historicoController.info}"
+                         rendered="#{not empty historicoController.info}" >
+
+                <p:column headerText="Nome do Arquivo">
+                    <h:outputText id="nomeInput" value="#{produto.get('nome')}"/>
+                </p:column>
+
+                <p:column headerText="Data de Upload" >
+                    <h:outputText id="precoInput" value="#{produto.get('data')}"/>
+
+                </p:column>
+
+                <p:column headerText="Tipo">
+                    <h:outputText id="quantidadeInput" value="#{produto.get('tipo')}"/>
+                </p:column>
+
+            </p:dataTable>
+        </div>
+    </ui:define>
+</ui:composition>

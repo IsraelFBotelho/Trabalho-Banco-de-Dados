@@ -8,22 +8,37 @@
 
 <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
     <h:head>
-
+            <title>Dados</title>
+            <link rel="stylesheet" type="text/css" href="resources/css/style.css"/>
     </h:head>
     <h:body>
-        <h:form id="barraDeFerramentas">
-            <p:toolbar>
-                <p:toolbarGroup align="left">
-                    <p:commandButton value="Upload de Arquivos" action="upload.xhtml" ajax="false"/>
-                    <p:spacer width="25"></p:spacer>
-                    <p:commandButton value="Relatorios" action="relatorios.xhtml" ajax="false"/>
-                    <p:spacer width="25"></p:spacer>
-                </p:toolbarGroup>
-            </p:toolbar>
+
+        <p:commandButton icon="pi pi-arrow-right" type="button" onclick="PF('sidebar1').show()" styleClass="mr-2" />
+
+        <h:form>
+            <div class="card">
+                <p:sidebar widgetVar="sidebar1" position="left">
+
+                    <h3 >Opções</h3>
+                    <div style="padding-top: 10px">
+                    <p:commandButton value="Upload" action="upload.xhtml" ajax="false" icon="pi pi-file-import" styleClass="ui-button-flat" />
+                    </div>
+                    <div style="padding-top: 10px">
+                    <p:commandButton value="Relatorios" action="relatorios.xhtml" ajax="false" icon="pi pi-chart-line" styleClass="ui-button-flat"/>
+                    </div>
+                    <div style="padding-top: 10px">
+                    <p:commandButton value="Historico" action="historico.xhtml" ajax="false" icon="pi pi-history" styleClass="ui-button-flat"/>
+                    </div>
+                    <div style="padding-top: 10px">
+                    <p:commandButton value="Informações" action="info.xhtml" ajax="false" icon="pi pi-question-circle" styleClass="ui-button-flat"/>
+                    </div>
+                </p:sidebar>
+            </div>
         </h:form>
+
     </h:body>
 
-    <div><ui:insert name="pagina" /></div>
+    <ui:insert name="pagina" />
 
 </f:view>
 

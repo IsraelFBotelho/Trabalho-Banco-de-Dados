@@ -7,47 +7,15 @@
         xmlns:p="http://primefaces.org/ui">
 
     <ui:define name="pagina">
-
         <p:growl id="messages" showDetail="true"/>
 
         <div class="card">
-            <h4 class="detail">Enviar Arquivo</h4>
+            <h4 class="text">Enviar Arquivo</h4>
             <h:form enctype="multipart/form-data">
                 <p:fileUpload value="#{uploadController.file}" mode="simple" skinSimple="true" allowTypes="/(\.|\/)(csv)$/"/>
 
                 <p:commandButton value="Submit" ajax="false" action="#{uploadController.upload}" styleClass="mt-3 ui-button-outlined block"/>
             </h:form>
-        </div>
-
-        <div class="card" style="">
-<!--            <h:panelGrid columns="3" cellpadding="5" style="margin: 0 auto;">-->
-<!--                <p:outputLabel for="input" value="Nome:"/>-->
-<!--                <p:inputText id="input" value="#{produtoController.produto.nome}"/>-->
-<!--                <p:commandButton update="produtos" value="Buscar"-->
-<!--                                 action="#{produtoController.get}">-->
-<!--                </p:commandButton>-->
-<!--            </h:panelGrid>-->
-
-            <p:growl id="growl" />
-            <p:dataTable id="tabelaProdutos" var="produto"
-                         value="#{uploadController.csv}"
-                         rendered="#{not empty uploadController.csv}" >
-
-                <p:column headerText="====">
-                    <h:outputText id="nomeInput" value="#{produto.get(0)}"/>
-                </p:column>
-
-                <p:column headerText="====" >
-                    <h:outputText id="precoInput" value="#{produto.get(1)}">
-                        <f:convertNumber type="currency" currencySymbol="R$" locale="pt_BR" />
-                    </h:outputText>
-                </p:column>
-
-                <p:column headerText="====">
-                    <h:outputText id="quantidadeInput" value="#{produto.get(2)}"/>
-                </p:column>
-
-            </p:dataTable>
         </div>
 
     </ui:define>
