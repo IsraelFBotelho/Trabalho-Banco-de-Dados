@@ -53,4 +53,26 @@ public class Regiao {
             }
         }
     }
+
+    public String getNomeByAcronym(String acronym) {
+        switch (acronym) {
+            case "CO":
+                return "CENTRO-OESTE";
+
+            case "N":
+                return "NORTE";
+
+            case "S":
+                return "SUL";
+
+            case "NE":
+                return "NORDESTE";
+
+            case "SE":
+                return "SUDESTE";
+
+            default:
+                return null;
+        }
+    }
 }

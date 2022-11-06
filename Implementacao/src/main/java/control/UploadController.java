@@ -1,8 +1,10 @@
 package control;
 
 import com.opencsv.CSVReader;
+import dao.EstadoDAO;
 import dao.RegiaoDAO;
 import jdbc.PgConnectionFactory;
+import models.Estado;
 import models.Regiao;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
