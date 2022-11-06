@@ -4,6 +4,7 @@ import interfaces.DAO;
 import jdbc.PgConnectionFactory;
 import models.Regiao;
 
+import javax.xml.transform.Result;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,6 +63,24 @@ public class RegiaoDAO implements DAO<Regiao> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public int getRegionId(String name) {
+        try {
+            String SQL = "SELECT id FROM ambiente.regiao WHERE nome = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+            statement.setString(1, name);
+
+            ResultSet results = statement.executeQuery();
+
+            if (results.next())
+                return results.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return -1;
     }
 
     @Override

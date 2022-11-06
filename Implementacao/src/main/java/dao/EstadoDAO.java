@@ -28,13 +28,12 @@ public class EstadoDAO implements DAO<Estado> {
     @Override
     public void create(List<Estado> models) {
         try {
-            String SQL = "INSERT INTO ambiente.estado (sigla, nome, id_regiao) VALUES (?, ?, ?) " +
-                    "ON CONFLICT (sigla, nome, id_regiao) DO NOTHING;";
+            String SQL = "INSERT INTO ambiente.estado (sigla, nome, id_regiao) VALUES (?, ?, ?);";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Estado e : models) {
-                statement.setString(1, e.getSigla());
-                statement.setString(2, e.getNome());
+                statement.setString(1, e.getSigla().toUpperCase());
+                statement.setString(2, e.getNome().toUpperCase());
                 statement.setInt(3, e.getIdRegiao());
                 statement.execute();
             }

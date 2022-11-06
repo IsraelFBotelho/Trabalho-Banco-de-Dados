@@ -1,5 +1,13 @@
 package models;
 
+import dao.RegiaoDAO;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Estado {
     private int id;
     private String sigla;
@@ -36,5 +44,54 @@ public class Estado {
 
     public void setIdRegiao(int idRegiao) {
         this.idRegiao = idRegiao;
+    }
+
+    public List<Estado> getStatesList() {
+        List<Estado> statesList = new ArrayList<>();
+        String states = "AC;Acre;N;" +
+                "AL;Alagoas;NE;" +
+                "AP;Amapá;N;" +
+                "AM;Amazonas;N;" +
+                "BA;Bahia;NE;" +
+                "CE;Ceará;NE;" +
+                "ES;Espírito Santo;SE;" +
+                "GO;Goiás;CO;" +
+                "MA;Maranhão;NE;" +
+                "MT;Mato Grosso;CO;" +
+                "MS;Mato Grosso do Sul;CO;" +
+                "MG;Minas Gerais;SE;" +
+                "PA;Pará;N;" +
+                "PB;Paraíba;NE;" +
+                "PR;Paraná;S;" +
+                "PE;Pernambubo;NE;" +
+                "PI;Piauí;NE;" +
+                "RJ;Rio de Janeiro;SE;" +
+                "RN;Rio Grande do Norte;NE;" +
+                "RS;Rio Grande do Sul;S;" +
+                "RO;Rondônia;N;" +
+                "RR;Roraima;N;" +
+                "SC;Santa Catarina;S;" +
+                "SP;São Paulo;SE;" +
+                "SE;Sergipe;NE;" +
+                "TO;Tocantins;N;" +
+                "DF;Distrito Federal;CO";
+
+        RegiaoDAO regionDao = new RegiaoDAO();
+        Regiao region = new Regiao();
+        String[] splited = states.split(";");
+        int count = 0;
+
+        while (count < splited.length) {
+            Estado s = new Estado();
+
+            s.setSigla(splited[count]);
+            s.setNome(splited[count + 1]);
+            s.setIdRegiao(regionDao.getRegionId(region.getNomeByAcronym(splited[count + 2])));
+
+            statesList.add(s);
+            count += 3;
+        }
+
+        return statesList;
     }
 }

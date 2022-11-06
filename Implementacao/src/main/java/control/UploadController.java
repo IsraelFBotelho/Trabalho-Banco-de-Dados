@@ -1,8 +1,10 @@
 package control;
 
 import com.opencsv.CSVReader;
+import dao.EstadoDAO;
 import dao.RegiaoDAO;
 import jdbc.PgConnectionFactory;
+import models.Estado;
 import models.Regiao;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
@@ -42,23 +44,9 @@ public class UploadController {
     }
 
     public void treatCsv() {
-        RegiaoDAO regiaoDao = new RegiaoDAO();
-        List<Regiao> regions = new ArrayList<>();
-
-        Regiao a = new Regiao();
-        a.setNomeByAcronym("S");
-
-        Regiao b = new Regiao();
-        b.setNomeByAcronym("Erro");
-
-        Regiao c = new Regiao();
-        c.setNomeByAcronym("NE");
-
-        regions.add(a);
-        regions.add(b);
-        regions.add(c);
-
-        regiaoDao.create(regions);
+        Estado s = new Estado();
+        EstadoDAO sDao = new EstadoDAO();
+        sDao.create(s.getStatesList());
 
         try {
             CSVReader csvReader = new CSVReader(
