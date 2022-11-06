@@ -33,6 +33,8 @@ public class UploadController {
     private List<Map<String, String>> csv;
     private UploadedFile file;
     private UploadedFiles files;
+
+    private Map<String, String> data;
     private String dropZoneText = "Drop zone p:inputTextarea demo.";
 
     public List<Map<String, String>> getCsv() {
@@ -44,9 +46,8 @@ public class UploadController {
     }
 
     public void treatCsv() {
-        Estado s = new Estado();
-        EstadoDAO sDao = new EstadoDAO();
-        sDao.create(s.getStatesList());
+
+        this.data = new HashMap<String,String>();
 
         try {
             CSVReader csvReader = new CSVReader(
@@ -59,7 +60,21 @@ public class UploadController {
 
             if (headers.length == 2) {
                 this.type = "clima";
+                this.data.put("regiao", headers[1]);
+                headers = csvReader.readNext();
+                this.data.put("uf", headers[1]);
+                headers = csvReader.readNext();
+                this.data.put("nome", headers[1]);
+                headers = csvReader.readNext();
+                this.data.put("codigo", headers[1]);
+                headers = csvReader.readNext();
+                headers = csvReader.readNext();
+                headers = csvReader.readNext();
+                headers = csvReader.readNext();
+                headers = csvReader.readNext();
             } else {
+                String st1=headers[9].replaceAll("[^0-9]", "");
+                this.data.put("ano", st1);
                 this.type = "desmatamento";
             }
 
