@@ -73,6 +73,8 @@ public class UploadController {
 
             String[] columns = null;
 
+            System.out.println(headers[0]);
+
             while ((columns = csvReader.readNext()) != null) {
                 Map<String, String> campos = new HashMap<String, String>();
 
@@ -189,7 +191,7 @@ public class UploadController {
         List<MedicaoClima> climateMeasurements = new ArrayList<>();
         String weatherStationId = this.data.get("codigo");
 
-        System.out.println(this.csv.get(0).keySet());
+        System.out.println(this.csv.get(209).get("DATA (YYYY-MM-DD)"));
     }
 
     private void populateBaseTables() {
