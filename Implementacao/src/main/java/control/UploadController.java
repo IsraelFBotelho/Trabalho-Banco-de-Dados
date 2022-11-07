@@ -49,8 +49,7 @@ public class UploadController {
     }
 
     public void treatCsv() {
-
-        this.data = new HashMap<String,String>();
+        this.data = new HashMap<String, String>();
 
         try {
             CSVReader csvReader = new CSVReader(
@@ -76,7 +75,7 @@ public class UploadController {
                 headers = csvReader.readNext();
                 headers = csvReader.readNext();
             } else {
-                String st1=headers[9].replaceAll("[^0-9]", "");
+                String st1 = headers[9].replaceAll("[^0-9]", "");
                 this.data.put("ano", st1);
                 this.type = "desmatamento";
             }

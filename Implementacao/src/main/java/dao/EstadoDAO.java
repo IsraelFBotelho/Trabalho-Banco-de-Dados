@@ -28,14 +28,24 @@ public class EstadoDAO implements DAO<Estado> {
     @Override
     public void create(List<Estado> models) {
         try {
-            String SQL = "INSERT INTO ambiente.estado (sigla, nome, id_regiao) VALUES (?, ?, ?);";
+            String SQL = "INSERT INTO ambiente.estado (sigla, nome, id_regiao) " +
+                    "SELECT ?, ?, ? " +
+                    "WHERE NOT EXISTS (" +
+                    "    SELECT id " +
+                    "    FROM ambiente.estado " +
+                    "    WHERE sigla = ? AND nome = ? AND id_regiao = ?);";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Estado e : models) {
-                statement.setString(1, e.getSigla().toUpperCase());
-                statement.setString(2, e.getNome().toUpperCase());
-                statement.setInt(3, e.getIdRegiao());
-                statement.execute();
+                if (e.getSigla() != null && e.getNome() != null) {
+                    statement.setString(1, e.getSigla().toUpperCase());
+                    statement.setString(2, e.getNome().toUpperCase());
+                    statement.setInt(3, e.getIdRegiao());
+                    statement.setString(4, e.getSigla().toUpperCase());
+                    statement.setString(5, e.getNome().toUpperCase());
+                    statement.setInt(6, e.getIdRegiao());
+                    statement.execute();
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -52,10 +62,10 @@ public class EstadoDAO implements DAO<Estado> {
 
             while (results.next()) {
                 Estado e = new Estado();
-                e.setId(results.getInt(0));
-                e.setSigla(results.getString(1));
-                e.setNome(results.getString(2));
-                e.setIdRegiao(results.getInt(3));
+                e.setId(results.getInt(1));
+                e.setSigla(results.getString(2));
+                e.setNome(results.getString(3));
+                e.setIdRegiao(results.getInt(4));
 
                 states.add(e);
             }
@@ -91,6 +101,22 @@ public class EstadoDAO implements DAO<Estado> {
 
             statement.setInt(1, Integer.parseInt(id));
             statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getStateIdByAcronym(String acronym) {
+        try {
+            String SQL = "SELECT id FROM ambiente.estado WHERE sigla = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            ResultSet results = statement.executeQuery();
+
+            if (results.next()) {
+                return results.getInt(1);
+            }
+
+            return -1;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
