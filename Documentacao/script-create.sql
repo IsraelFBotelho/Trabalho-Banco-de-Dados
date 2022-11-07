@@ -72,3 +72,11 @@ CREATE TABLE ambiente.desmatamento (
     CONSTRAINT fk_desmatamento_floresta FOREIGN KEY(id_floresta) REFERENCES ambiente.floresta(id),
     CONSTRAINT pk_desmatamento PRIMARY KEY(id_floresta)
 );
+
+CREATE TABLE ambiente.historico (
+    id SERIAL,
+    nome VARCHAR(100),
+    tipo VARCHAR(15),
+    data DATE,
+    CONSTRAINT pk_historico PRIMARY KEY (id)
+);
