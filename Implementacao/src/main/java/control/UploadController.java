@@ -2,6 +2,7 @@ package control;
 
 import com.opencsv.CSVReader;
 import dao.*;
+import jdbc.PgConnectionFactory;
 import models.*;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
@@ -16,14 +17,19 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
+import java.sql.Time;
 import java.util.*;
 
 @Named
 @ManagedBean
 @RequestScoped
 public class UploadController {
+    private Connection connection = null;
     private String type;
     private List<Map<String, String>> csv;
     private UploadedFile file;
@@ -39,19 +45,31 @@ public class UploadController {
         this.csv = csv;
     }
 
+    private void setConnection() {
+        try {
+            PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
+            this.connection = pgConnectionFactory.getConnection();
+        } catch (IOException | SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void treatCsv() {
         this.data = new HashMap<String, String>();
 
         try {
             CSVReader csvReader = new CSVReader(
                     new InputStreamReader(
-                            new ByteArrayInputStream(file.getContent()), "ISO-8859-1"), ';');
+                            new ByteArrayInputStream(file.getContent()), "UTF-8"), ';');
 
             this.csv = new ArrayList<Map<String, String>>();
-
             String[] headers = csvReader.readNext();
 
             if (headers.length == 2) {
+                csvReader = new CSVReader(
+                        new InputStreamReader(
+                                new ByteArrayInputStream(file.getContent()), "ISO-8859-1"), ';');
+                headers = csvReader.readNext();
                 this.type = "clima";
                 this.data.put("regiao", headers[1]);
                 headers = csvReader.readNext();
@@ -85,6 +103,7 @@ public class UploadController {
                 this.csv.add(campos);
             }
 
+            this.setConnection();
             this.createHistory();
             this.create();
         } catch (Exception e) {
@@ -128,7 +147,7 @@ public class UploadController {
     }
 
     private void createHistory() {
-        HistoricoDAO historyDao = new HistoricoDAO();
+        HistoricoDAO historyDao = new HistoricoDAO(this.connection);
         List<Historico> list = new ArrayList<>();
         Historico history = new Historico();
         Date date = new Date(System.currentTimeMillis());
@@ -143,14 +162,19 @@ public class UploadController {
 
     private void create() {
         populateBaseTables();
-        createCity();
-        createWeatherStation();
-        createClimateMeasurement();
+
+        if (this.type.equals("clima")) {
+            createCity();
+            createWeatherStation();
+            createClimateMeasurement();
+        } else {
+            createGeographicalArea();
+        }
     }
 
     private void createCity() {
-        MunicipioDAO cityDao = new MunicipioDAO();
-        EstadoDAO stateDao = new EstadoDAO();
+        MunicipioDAO cityDao = new MunicipioDAO(this.connection);
+        EstadoDAO stateDao = new EstadoDAO(this.connection);
         List<Municipio> cities = new ArrayList<>();
 
         int stateId = stateDao.getStateIdByAcronym(this.data.get("uf"));
@@ -166,9 +190,23 @@ public class UploadController {
         }
     }
 
+    private void createCity(String name, String stateAcronym) {
+        MunicipioDAO cityDao = new MunicipioDAO(this.connection);
+        EstadoDAO stateDao = new EstadoDAO(this.connection);
+        int stateId = stateDao.getStateIdByAcronym(stateAcronym);
+
+        if (stateId != -1) {
+            Municipio city = new Municipio();
+
+            city.setNome(name);
+            city.setIdEstado(stateId);
+            cityDao.create(city);
+        }
+    }
+
     private void createWeatherStation() {
-        MunicipioDAO cityDao = new MunicipioDAO();
-        EstacaoMetereologicaDAO weatherStationDao = new EstacaoMetereologicaDAO();
+        MunicipioDAO cityDao = new MunicipioDAO(this.connection);
+        EstacaoMetereologicaDAO weatherStationDao = new EstacaoMetereologicaDAO(this.connection);
         List<EstacaoMetereologica> weatherStations = new ArrayList<>();
 
         int cityId = cityDao.getCityIdByName(this.data.get("nome"));
@@ -186,17 +224,54 @@ public class UploadController {
     }
 
     private void createClimateMeasurement() {
-        MedicaoClima climateMeasurement = new MedicaoClima();
-        MedicaoClimaDAO climateMeasurementDao = new MedicaoClimaDAO();
+        MedicaoClimaDAO climateMeasurementDao = new MedicaoClimaDAO(this.connection);
         List<MedicaoClima> climateMeasurements = new ArrayList<>();
         String weatherStationId = this.data.get("codigo");
 
-        System.out.println(this.csv.get(209).get("DATA (YYYY-MM-DD)"));
+        for (Map<String, String> e : this.csv) {
+            MedicaoClima climateMeasurement = new MedicaoClima();
+
+            Date date = Date.valueOf(e.get("DATA (YYYY-MM-DD)"));
+            Time time = Time.valueOf((e.get("HORA (UTC)")) + ":00");
+            float min = Float.parseFloat(e.get("TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)").replaceAll(",", "."));
+            float max = Float.parseFloat(e.get("TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)").replaceAll(",", "."));
+
+            climateMeasurement.setHora(time);
+            climateMeasurement.setData(date);
+            climateMeasurement.setTemperaturaMaxima(max);
+            climateMeasurement.setTemperaturaMinima(min);
+            climateMeasurement.setCodigoEstacaoMetereologica(weatherStationId);
+
+            climateMeasurements.add(climateMeasurement);
+        }
+
+        climateMeasurementDao.create(climateMeasurements);
+    }
+
+    private void createGeographicalArea() {
+        AreaGeograficaDAO geographicalAreaDao = new AreaGeograficaDAO(this.connection);
+        MunicipioDAO cityDao = new MunicipioDAO(this.connection);
+        List<AreaGeografica> geographicalAreas = new ArrayList<>();
+
+        for (Map<String, String> e : this.csv) {
+            createCity(e.get("Municipio"), e.get("Estado"));
+
+//            if (cityId != -1) {
+//                EstacaoMetereologica weatherStation = new EstacaoMetereologica();
+//
+//                weatherStation.setCodigo(this.data.get("codigo"));
+//                weatherStation.setNome(this.data.get("nome"));
+//                weatherStation.setIdMunicipio(cityId);
+//                weatherStations.add(weatherStation);
+//
+//                weatherStationDao.create(weatherStations);
+//            }
+        }
     }
 
     private void populateBaseTables() {
-        RegiaoDAO regionDao = new RegiaoDAO();
-        EstadoDAO stateDao = new EstadoDAO();
+        RegiaoDAO regionDao = new RegiaoDAO(this.connection);
+        EstadoDAO stateDao = new EstadoDAO(this.connection);
 
         if (regionDao.isEmpty()) {
             // Insere a lista com todas as regiões do Brasil.
@@ -207,7 +282,7 @@ public class UploadController {
         if (stateDao.isEmpty()) {
             // Insere a lista com todos os estados do Brasil.
             Estado state = new Estado();
-            stateDao.create(state.getStatesList());
+            stateDao.create(state.getStatesList(this.connection));
         }
     }
 

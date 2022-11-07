@@ -1,21 +1,18 @@
 package models;
 
-import java.sql.Time;
-import java.util.Date;
-
 public class MedicaoClima {
-    private java.sql.Date dt;
+    private java.sql.Date data;
     private java.sql.Time hora;
     private String codigoEstacaoMetereologica;
     private float temperaturaMinima;
     private float temperaturaMaxima;
 
-    public java.sql.Date getDt() {
-        return dt;
+    public java.sql.Date getData() {
+        return data;
     }
 
-    public void setDt(java.sql.Date dt) {
-        this.dt = dt;
+    public void setData(java.sql.Date data) {
+        this.data = data;
     }
 
     public java.sql.Time getHora() {

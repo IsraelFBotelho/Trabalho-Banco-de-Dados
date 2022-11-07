@@ -15,14 +15,8 @@ import java.util.List;
 public class EstadoDAO implements DAO<Estado> {
     private Connection connection = null;
 
-    public EstadoDAO() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public EstadoDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -53,6 +47,11 @@ public class EstadoDAO implements DAO<Estado> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void create(Estado model) {
+        
     }
 
     @Override

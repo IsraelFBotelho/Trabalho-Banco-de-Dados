@@ -15,54 +15,49 @@ import java.util.List;
 public class MedicaoClimaDAO implements DAO<MedicaoClima> {
     private Connection connection = null;
 
-    public MedicaoClimaDAO() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public MedicaoClimaDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
     public void create(List<MedicaoClima> models) {
         try {
-
             List<MedicaoClima> exist = this.read();
-
             String SQL = "INSERT INTO ambiente.medicao_clima (data, hora, codigo_estacao_metereologica, temperatura_minima, temperatura_maxima)" +
                     "VALUES (?, ?, ?, ?, ?)";
-
-
             String SQLupdate = "UPDATE ambiente.medicao_clima SET temperatura_minima = ?, temperatura_maxima = ? WHERE data = ? AND hora = ? AND codigo_estacao_metereologica = ? ";
 
             PreparedStatement statement;
 
             for (MedicaoClima e : models) {
+                MedicaoClima ex = exist.stream().filter((x) -> x.getHora().equals(e.getHora()) && x.getData().equals(e.getData()) && x.getCodigoEstacaoMetereologica().equals(e.getCodigoEstacaoMetereologica())).findFirst().orElse(null);
 
-                MedicaoClima ex = exist.stream().filter((x) -> x.getHora() == e.getHora() && x.getDt() == e.getDt() && x.getCodigoEstacaoMetereologica() == e.getCodigoEstacaoMetereologica()).findFirst().orElse(null);
-
-                if(ex == null){
+                if (ex == null) {
                     statement = connection.prepareStatement(SQL);
-                    statement.setDate(1, e.getDt());
+                    statement.setDate(1, e.getData());
                     statement.setTime(2, e.getHora());
                     statement.setString(3, e.getCodigoEstacaoMetereologica());
                     statement.setFloat(4, e.getTemperaturaMinima());
                     statement.setFloat(5, e.getTemperaturaMaxima());
-                }else{
+                    statement.execute();
+                } else {
                     statement = connection.prepareStatement(SQLupdate);
                     statement.setFloat(1, e.getTemperaturaMinima());
                     statement.setFloat(2, e.getTemperaturaMaxima());
-                    statement.setDate(3, e.getDt());
+                    statement.setDate(3, e.getData());
                     statement.setTime(4, e.getHora());
                     statement.setString(5, e.getCodigoEstacaoMetereologica());
+                    statement.execute();
                 }
-
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void create(MedicaoClima model) {
+
     }
 
     @Override
@@ -75,11 +70,11 @@ public class MedicaoClimaDAO implements DAO<MedicaoClima> {
 
             while (results.next()) {
                 MedicaoClima e = new MedicaoClima();
-                e.setDt(results.getDate(0));
-                e.setHora(results.getTime(1));
-                e.setCodigoEstacaoMetereologica(results.getString(2));
-                e.setTemperaturaMinima(results.getFloat(3));
-                e.setTemperaturaMaxima(results.getFloat(4));
+                e.setData(results.getDate(1));
+                e.setHora(results.getTime(2));
+                e.setCodigoEstacaoMetereologica(results.getString(3));
+                e.setTemperaturaMinima(results.getFloat(4));
+                e.setTemperaturaMaxima(results.getFloat(5));
 
                 weathers.add(e);
             }

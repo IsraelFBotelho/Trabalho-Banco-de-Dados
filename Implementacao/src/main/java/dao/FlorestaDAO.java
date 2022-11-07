@@ -12,14 +12,8 @@ import java.util.List;
 public class FlorestaDAO implements DAO<Floresta> {
     private Connection connection = null;
 
-    public FlorestaDAO() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public FlorestaDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -51,6 +45,11 @@ public class FlorestaDAO implements DAO<Floresta> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void create(Floresta model) {
+
     }
 
     @Override

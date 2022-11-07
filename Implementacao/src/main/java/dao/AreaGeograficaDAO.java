@@ -16,14 +16,8 @@ import java.util.List;
 public class AreaGeograficaDAO implements DAO<AreaGeografica> {
     private Connection connection = null;
 
-    public AreaGeograficaDAO() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public AreaGeograficaDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -51,6 +45,11 @@ public class AreaGeograficaDAO implements DAO<AreaGeografica> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void create(AreaGeografica model) {
+
     }
 
     @Override

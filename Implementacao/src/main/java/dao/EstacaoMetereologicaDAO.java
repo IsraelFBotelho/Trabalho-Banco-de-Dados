@@ -15,14 +15,8 @@ import java.util.List;
 public class EstacaoMetereologicaDAO implements DAO<EstacaoMetereologica> {
     private Connection connection = null;
 
-    public EstacaoMetereologicaDAO() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public EstacaoMetereologicaDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -49,6 +43,11 @@ public class EstacaoMetereologicaDAO implements DAO<EstacaoMetereologica> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void create(EstacaoMetereologica model) {
+
     }
 
     @Override

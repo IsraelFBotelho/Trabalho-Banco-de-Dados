@@ -2,6 +2,7 @@ package models;
 
 import dao.RegiaoDAO;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class Estado {
         this.idRegiao = idRegiao;
     }
 
-    public List<Estado> getStatesList() {
+    public List<Estado> getStatesList(Connection connection) {
         List<Estado> statesList = new ArrayList<>();
         String states = "AC;Acre;N;" +
                 "AL;Alagoas;NE;" +
@@ -73,7 +74,7 @@ public class Estado {
                 "TO;Tocantins;N;" +
                 "DF;Distrito Federal;CO";
 
-        RegiaoDAO regionDao = new RegiaoDAO();
+        RegiaoDAO regionDao = new RegiaoDAO(connection);
         Regiao region = new Regiao();
         String[] splited = states.split(";");
         int count = 0;

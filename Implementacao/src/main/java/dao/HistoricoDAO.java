@@ -17,14 +17,8 @@ public class HistoricoDAO implements DAO<Historico> {
 
     private Connection connection = null;
 
-    public HistoricoDAO(){
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public HistoricoDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -43,6 +37,11 @@ public class HistoricoDAO implements DAO<Historico> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void create(Historico model) {
+
     }
 
     @Override

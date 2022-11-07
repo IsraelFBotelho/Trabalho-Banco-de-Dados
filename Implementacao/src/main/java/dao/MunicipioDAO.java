@@ -15,14 +15,8 @@ import java.util.List;
 public class MunicipioDAO implements DAO<Municipio> {
     private Connection connection = null;
 
-    public MunicipioDAO() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public MunicipioDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -34,7 +28,8 @@ public class MunicipioDAO implements DAO<Municipio> {
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Municipio e : models) {
-                Municipio ex = exist.stream().filter(x -> x.getNome().equals(e.getNome())).findFirst().orElse(null);
+                Municipio ex = exist.stream().filter(
+                        (x) -> x.getNome().equals(e.getNome().toUpperCase())).findFirst().orElse(null);
 
                 if (ex == null) {
                     statement.setString(1, e.getNome().toUpperCase());
@@ -43,6 +38,28 @@ public class MunicipioDAO implements DAO<Municipio> {
                 } else {
                     this.update(e);
                 }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void create(Municipio model) {
+        List<Municipio> exist = this.read();
+
+        try {
+            String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) VALUES (?, ?);";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            Municipio ex = exist.stream().filter(
+                    (x) -> x.getNome().equals(model.getNome().toUpperCase())).findFirst().orElse(null);
+
+            if (ex == null) {
+                statement.setString(1, model.getNome().toUpperCase());
+                statement.setInt(2, model.getIdEstado());
+                statement.execute();
+            } else {
+                this.update(model);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

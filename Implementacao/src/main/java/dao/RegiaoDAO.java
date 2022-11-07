@@ -16,14 +16,8 @@ import java.util.List;
 public class RegiaoDAO implements DAO<Regiao> {
     private Connection connection = null;
 
-    public RegiaoDAO() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public RegiaoDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -41,6 +35,11 @@ public class RegiaoDAO implements DAO<Regiao> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void create(Regiao model) {
+
     }
 
     @Override

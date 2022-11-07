@@ -16,14 +16,8 @@ import java.util.List;
 public class DesmatamentoDAO implements DAO<Desmatamento> {
     private Connection connection = null;
 
-    public DesmatamentoDAO() {
-        PgConnectionFactory pgConnectionFactory = new PgConnectionFactory();
-
-        try {
-            this.connection = pgConnectionFactory.getConnection();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public DesmatamentoDAO(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -52,6 +46,11 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void create(Desmatamento model) {
+
     }
 
     @Override
