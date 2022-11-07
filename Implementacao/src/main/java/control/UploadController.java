@@ -1,13 +1,8 @@
 package control;
 
 import com.opencsv.CSVReader;
-import dao.EstadoDAO;
-import dao.HistoricoDAO;
-import dao.RegiaoDAO;
-import jdbc.PgConnectionFactory;
-import models.Estado;
-import models.Historico;
-import models.Regiao;
+import dao.*;
+import models.*;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.FilesUploadEvent;
@@ -21,22 +16,18 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Date;
-import java.sql.SQLException;
 import java.util.*;
 
 @Named
 @ManagedBean
 @RequestScoped
 public class UploadController {
-
     private String type;
     private List<Map<String, String>> csv;
     private UploadedFile file;
     private UploadedFiles files;
-
     private Map<String, String> data;
     private String dropZoneText = "Drop zone p:inputTextarea demo.";
 
@@ -54,7 +45,7 @@ public class UploadController {
         try {
             CSVReader csvReader = new CSVReader(
                     new InputStreamReader(
-                            new ByteArrayInputStream(file.getContent()),"ISO-8859-1"), ';');
+                            new ByteArrayInputStream(file.getContent()), "ISO-8859-1"), ';');
 
             this.csv = new ArrayList<Map<String, String>>();
 
@@ -92,15 +83,8 @@ public class UploadController {
                 this.csv.add(campos);
             }
 
-            HistoricoDAO dao = new HistoricoDAO();
-            List<Historico> list = new ArrayList<>();
-            Historico e = new Historico();
-            e.setTipo(this.type);
-            Date date = new Date(System.currentTimeMillis());
-            e.setData(date);
-            e.setNome(this.file.getFileName());
-            list.add(e);
-            dao.create(list);
+            this.createHistory();
+            this.create();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,6 +125,90 @@ public class UploadController {
         }
     }
 
+    private void createHistory() {
+        HistoricoDAO historyDao = new HistoricoDAO();
+        List<Historico> list = new ArrayList<>();
+        Historico history = new Historico();
+        Date date = new Date(System.currentTimeMillis());
+
+        history.setTipo(this.type);
+        history.setData(date);
+        history.setNome(this.file.getFileName());
+
+        list.add(history);
+        historyDao.create(list);
+    }
+
+    private void create() {
+        populateBaseTables();
+        createCity();
+        createWeatherStation();
+        createClimateMeasurement();
+    }
+
+    private void createCity() {
+        MunicipioDAO cityDao = new MunicipioDAO();
+        EstadoDAO stateDao = new EstadoDAO();
+        List<Municipio> cities = new ArrayList<>();
+
+        int stateId = stateDao.getStateIdByAcronym(this.data.get("uf"));
+
+        if (stateId != -1) {
+            Municipio city = new Municipio();
+
+            city.setNome(this.data.get("nome"));
+            city.setIdEstado(stateId);
+            cities.add(city);
+
+            cityDao.create(cities);
+        }
+    }
+
+    private void createWeatherStation() {
+        MunicipioDAO cityDao = new MunicipioDAO();
+        EstacaoMetereologicaDAO weatherStationDao = new EstacaoMetereologicaDAO();
+        List<EstacaoMetereologica> weatherStations = new ArrayList<>();
+
+        int cityId = cityDao.getCityIdByName(this.data.get("nome"));
+
+        if (cityId != -1) {
+            EstacaoMetereologica weatherStation = new EstacaoMetereologica();
+
+            weatherStation.setCodigo(this.data.get("codigo"));
+            weatherStation.setNome(this.data.get("nome"));
+            weatherStation.setIdMunicipio(cityId);
+            weatherStations.add(weatherStation);
+
+            weatherStationDao.create(weatherStations);
+        }
+    }
+
+    private void createClimateMeasurement() {
+        MedicaoClima climateMeasurement = new MedicaoClima();
+        MedicaoClimaDAO climateMeasurementDao = new MedicaoClimaDAO();
+        List<MedicaoClima> climateMeasurements = new ArrayList<>();
+        String weatherStationId = this.data.get("codigo");
+
+        System.out.println(this.csv.get(0).keySet());
+    }
+
+    private void populateBaseTables() {
+        RegiaoDAO regionDao = new RegiaoDAO();
+        EstadoDAO stateDao = new EstadoDAO();
+
+        if (regionDao.isEmpty()) {
+            // Insere a lista com todas as regiões do Brasil.
+            Regiao region = new Regiao();
+            regionDao.create(region.getRegionsList());
+        }
+
+        if (stateDao.isEmpty()) {
+            // Insere a lista com todos os estados do Brasil.
+            Estado state = new Estado();
+            stateDao.create(state.getStatesList());
+        }
+    }
+
     public UploadedFile getFile() {
         return file;
     }
@@ -164,9 +232,4 @@ public class UploadController {
     public void setDropZoneText(String dropZoneText) {
         this.dropZoneText = dropZoneText;
     }
-
-    private void insert(){
-
-    }
-
 }

@@ -1,5 +1,8 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Regiao {
     private int id;
     private String nome;
@@ -20,7 +23,7 @@ public class Regiao {
         this.nome = nome;
     }
 
-    public void setNomeByAcronym(String acronym) {
+    public void setNameByAcronym(String acronym) {
         switch (acronym) {
             case "CO": {
                 this.nome = "CENTRO-OESTE";
@@ -54,7 +57,7 @@ public class Regiao {
         }
     }
 
-    public String getNomeByAcronym(String acronym) {
+    public String getNameByAcronym(String acronym) {
         switch (acronym) {
             case "CO":
                 return "CENTRO-OESTE";
@@ -74,5 +77,19 @@ public class Regiao {
             default:
                 return null;
         }
+    }
+
+    public List<Regiao> getRegionsList() {
+        String[] regionsName = {"CENTRO-OESTE", "NORTE", "SUL", "NORDESTE", "SUDESTE"};
+        List<Regiao> regionsList = new ArrayList<>();
+
+        for (String r : regionsName) {
+            Regiao region = new Regiao();
+
+            region.setNome(r);
+            regionsList.add(region);
+        }
+
+        return regionsList;
     }
 }

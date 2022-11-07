@@ -65,24 +65,6 @@ public class RegiaoDAO implements DAO<Regiao> {
         }
     }
 
-    public int getRegionId(String name) {
-        try {
-            String SQL = "SELECT id FROM ambiente.regiao WHERE nome = ?;";
-            PreparedStatement statement = connection.prepareStatement(SQL);
-
-            statement.setString(1, name);
-
-            ResultSet results = statement.executeQuery();
-
-            if (results.next())
-                return results.getInt(1);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return -1;
-    }
-
     @Override
     public void update(List<Regiao> models) {
         try {
@@ -107,6 +89,36 @@ public class RegiaoDAO implements DAO<Regiao> {
 
             statement.setInt(1, Integer.parseInt(id));
             statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getRegionId(String name) {
+        try {
+            String SQL = "SELECT id FROM ambiente.regiao WHERE nome = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+            statement.setString(1, name);
+
+            ResultSet results = statement.executeQuery();
+
+            if (results.next())
+                return results.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return -1;
+    }
+
+    public boolean isEmpty() {
+        try {
+            String SQL = "SELECT id FROM ambiente.regiao;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            ResultSet results = statement.executeQuery();
+
+            return !results.next();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

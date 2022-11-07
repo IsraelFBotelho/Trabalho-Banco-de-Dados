@@ -27,24 +27,20 @@ public class MunicipioDAO implements DAO<Municipio> {
 
     @Override
     public void create(List<Municipio> models) {
-
         List<Municipio> exist = this.read();
 
         try {
-            String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) VALUES (?,?);";
+            String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) VALUES (?, ?);";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Municipio e : models) {
+                Municipio ex = exist.stream().filter(x -> x.getNome().equals(e.getNome())).findFirst().orElse(null);
 
-                Municipio ex = exist.stream().filter((x)-> x.getNome() == e.getNome()).findFirst().orElse(null);
-
-
-                if(ex == null) {
-
+                if (ex == null) {
                     statement.setString(1, e.getNome().toUpperCase());
                     statement.setInt(2, e.getIdEstado());
                     statement.execute();
-                }else{
+                } else {
                     this.update(e);
                 }
             }
@@ -63,9 +59,10 @@ public class MunicipioDAO implements DAO<Municipio> {
 
             while (results.next()) {
                 Municipio e = new Municipio();
-                e.setId(results.getInt(0));
-                e.setNome(results.getString(1));
-                e.setIdEstado(results.getInt(2));
+
+                e.setId(results.getInt(1));
+                e.setNome(results.getString(2));
+                e.setIdEstado(results.getInt(3));
 
                 cities.add(e);
             }
@@ -93,7 +90,7 @@ public class MunicipioDAO implements DAO<Municipio> {
         }
     }
 
-    public void update(Municipio model){
+    public void update(Municipio model) {
         try {
             String SQL = "UPDATE ambiente.municipio SET id_estado = ? WHERE nome = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
@@ -115,6 +112,24 @@ public class MunicipioDAO implements DAO<Municipio> {
 
             statement.setInt(1, Integer.parseInt(id));
             statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getCityIdByName(String name) {
+        try {
+            String SQL = "SELECT id FROM ambiente.municipio WHERE nome = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+            statement.setString(1, name);
+
+            ResultSet results = statement.executeQuery();
+
+            if (results.next())
+                return results.getInt(1);
+
+            return -1;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

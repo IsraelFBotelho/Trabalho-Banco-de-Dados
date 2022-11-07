@@ -38,14 +38,14 @@ public class EstadoDAO implements DAO<Estado> {
 
                 Estado ex = exist.stream().filter((x) -> x.getSigla() == e.getSigla()).findFirst().orElse(null);
 
-                if(ex == null) {
+                if (ex == null) {
 
                     statement.setString(1, e.getSigla().toUpperCase());
                     statement.setString(2, e.getNome().toUpperCase());
                     statement.setInt(3, e.getIdRegiao());
 
                     statement.execute();
-                }else {
+                } else {
                     this.update(e);
                 }
 
@@ -96,15 +96,15 @@ public class EstadoDAO implements DAO<Estado> {
         }
     }
 
-    public void update(Estado model){
-        try{
+    public void update(Estado model) {
+        try {
             String SQL = "UPDATE ambiente.estado SET nome = ?, id_regiao = ? WHERE sigla = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
-                statement.setString(1, model.getNome());
-                statement.setInt(2, model.getIdRegiao());
-                statement.setString(3, model.getSigla());
-                statement.execute();
+            statement.setString(1, model.getNome());
+            statement.setInt(2, model.getIdRegiao());
+            statement.setString(3, model.getSigla());
+            statement.execute();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -128,6 +128,9 @@ public class EstadoDAO implements DAO<Estado> {
         try {
             String SQL = "SELECT id FROM ambiente.estado WHERE sigla = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
+
+            statement.setString(1, acronym);
+
             ResultSet results = statement.executeQuery();
 
             if (results.next()) {
@@ -135,6 +138,18 @@ public class EstadoDAO implements DAO<Estado> {
             }
 
             return -1;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean isEmpty() {
+        try {
+            String SQL = "SELECT id FROM ambiente.estado;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            ResultSet results = statement.executeQuery();
+
+            return !results.next();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

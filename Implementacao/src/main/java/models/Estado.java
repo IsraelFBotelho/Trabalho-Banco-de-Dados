@@ -2,9 +2,6 @@ package models;
 
 import dao.RegiaoDAO;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +83,7 @@ public class Estado {
 
             s.setSigla(splited[count]);
             s.setNome(splited[count + 1]);
-            s.setIdRegiao(regionDao.getRegionId(region.getNomeByAcronym(splited[count + 2])));
+            s.setIdRegiao(regionDao.getRegionId(region.getNameByAcronym(splited[count + 2])));
 
             statesList.add(s);
             count += 3;
