@@ -22,7 +22,6 @@ public class AreaGeograficaDAO implements DAO<AreaGeografica> {
 
     @Override
     public void create(List<AreaGeografica> models) {
-
         List<AreaGeografica> exist = this.read();
 
         try {
@@ -30,15 +29,13 @@ public class AreaGeograficaDAO implements DAO<AreaGeografica> {
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (AreaGeografica e : models) {
-
                 AreaGeografica ex = exist.stream().filter((x) -> x.getIdMunicipio() == e.getIdMunicipio()).findFirst().orElse(null);
 
-                if(ex == null) {
-
+                if (ex == null) {
                     statement.setFloat(1, e.getAreaTotal());
                     statement.setInt(2, e.getIdMunicipio());
                     statement.execute();
-                }else{
+                } else {
                     this.update(e);
                 }
             }
@@ -49,7 +46,24 @@ public class AreaGeograficaDAO implements DAO<AreaGeografica> {
 
     @Override
     public void create(AreaGeografica model) {
+        List<AreaGeografica> exist = this.read();
 
+        try {
+            String SQL = "INSERT INTO ambiente.area_geografica (area_total, id_municipio) VALUES (?, ?);";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            AreaGeografica ex = exist.stream().filter((x) -> x.getIdMunicipio() == model.getIdMunicipio()).findFirst().orElse(null);
+
+            if (ex == null) {
+                statement.setFloat(1, model.getAreaTotal());
+                statement.setInt(2, model.getIdMunicipio());
+                statement.execute();
+            } else {
+                this.update(model);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -62,9 +76,9 @@ public class AreaGeograficaDAO implements DAO<AreaGeografica> {
 
             while (results.next()) {
                 AreaGeografica e = new AreaGeografica();
-                e.setId(results.getInt(0));
-                e.setAreaTotal(results.getFloat(1));
-                e.setIdMunicipio(results.getInt(2));
+                e.setId(results.getInt(1));
+                e.setAreaTotal(results.getFloat(2));
+                e.setIdMunicipio(results.getInt(3));
 
                 areas.add(e);
             }
@@ -92,7 +106,7 @@ public class AreaGeograficaDAO implements DAO<AreaGeografica> {
         }
     }
 
-    public void update(AreaGeografica model){
+    public void update(AreaGeografica model) {
         try {
             String SQL = "UPDATE ambiente.area_geografica SET area_total = ? WHERE id_municipio = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
@@ -114,6 +128,24 @@ public class AreaGeograficaDAO implements DAO<AreaGeografica> {
 
             statement.setInt(1, Integer.parseInt(id));
             statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getGeographicalAreaIdByCityId(int cityId) {
+        try {
+            String SQL = "SELECT id FROM ambiente.area_geografica WHERE id_municipio = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+            statement.setInt(1, cityId);
+
+            ResultSet results = statement.executeQuery();
+
+            if (results.next())
+                return results.getInt(1);
+
+            return -1;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

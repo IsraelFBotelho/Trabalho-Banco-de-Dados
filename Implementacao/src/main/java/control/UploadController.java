@@ -85,13 +85,18 @@ public class UploadController {
                 headers = csvReader.readNext();
             } else {
                 String st1 = headers[9].replaceAll("[^0-9]", "");
+                headers[10] = headers[10].replaceAll("[^A-Za-z]", "");
+                headers[11] = headers[11].replaceAll("[^A-Za-z]", "");
+                headers[12] = headers[12].replaceAll("[^A-Za-z]", "");
+                headers[13] = headers[13].replaceAll("[^A-Za-z]", "");
+                headers[14] = headers[14].replaceAll("[^A-Za-z]", "");
+                headers[15] = headers[15].replaceAll("[^A-Za-z]", "");
+
                 this.data.put("ano", st1);
                 this.type = "desmatamento";
             }
 
             String[] columns = null;
-
-            System.out.println(headers[0]);
 
             while ((columns = csvReader.readNext()) != null) {
                 Map<String, String> campos = new HashMap<String, String>();
@@ -167,9 +172,8 @@ public class UploadController {
             createCity();
             createWeatherStation();
             createClimateMeasurement();
-        } else {
-            createGeographicalArea();
-        }
+        } else
+            createDeforestationInfo();
     }
 
     private void createCity() {
@@ -190,7 +194,7 @@ public class UploadController {
         }
     }
 
-    private void createCity(String name, String stateAcronym) {
+    private int createCity(String name, String stateAcronym) {
         MunicipioDAO cityDao = new MunicipioDAO(this.connection);
         EstadoDAO stateDao = new EstadoDAO(this.connection);
         int stateId = stateDao.getStateIdByAcronym(stateAcronym);
@@ -200,8 +204,11 @@ public class UploadController {
 
             city.setNome(name);
             city.setIdEstado(stateId);
+
             cityDao.create(city);
         }
+
+        return cityDao.getCityIdByName(name);
     }
 
     private void createWeatherStation() {
@@ -248,24 +255,71 @@ public class UploadController {
         climateMeasurementDao.create(climateMeasurements);
     }
 
-    private void createGeographicalArea() {
-        AreaGeograficaDAO geographicalAreaDao = new AreaGeograficaDAO(this.connection);
-        MunicipioDAO cityDao = new MunicipioDAO(this.connection);
-        List<AreaGeografica> geographicalAreas = new ArrayList<>();
-
+    // Insere informações do CSV de desmatamento.
+    private void createDeforestationInfo() {
         for (Map<String, String> e : this.csv) {
-            createCity(e.get("Municipio"), e.get("Estado"));
+            int cityId = createCity(e.get("Municipio"), e.get("Estado"));
+            int geographicalAreaId = createGeographicalArea(e, cityId);
+            createForest(e, cityId);
+            createDeforestation(e, geographicalAreaId);
+        }
+    }
 
-//            if (cityId != -1) {
-//                EstacaoMetereologica weatherStation = new EstacaoMetereologica();
-//
-//                weatherStation.setCodigo(this.data.get("codigo"));
-//                weatherStation.setNome(this.data.get("nome"));
-//                weatherStation.setIdMunicipio(cityId);
-//                weatherStations.add(weatherStation);
-//
-//                weatherStationDao.create(weatherStations);
-//            }
+    // Insere informações de áreas geográficas.
+    private int createGeographicalArea(Map<String, String> map, int cityId) {
+        AreaGeograficaDAO geographicalAreaDao = new AreaGeograficaDAO(this.connection);
+
+        if (cityId != -1) {
+            AreaGeografica geographicalArea = new AreaGeografica();
+
+            geographicalArea.setAreaTotal(Float.parseFloat(map.get("AreaKm2")));
+            geographicalArea.setIdMunicipio(cityId);
+
+            geographicalAreaDao.create(geographicalArea);
+        }
+
+        return geographicalAreaDao.getGeographicalAreaIdByCityId(cityId);
+    }
+
+    // Insere informações de florestas.
+    private void createForest(Map<String, String> map, int cityId) {
+        if (cityId == -1)
+            return;
+
+        AreaGeograficaDAO geographicalAreaDao = new AreaGeograficaDAO(this.connection);
+        FlorestaDAO forestDao = new FlorestaDAO(this.connection);
+        int geographicalAreaId = geographicalAreaDao.getGeographicalAreaIdByCityId(cityId);
+
+        if (geographicalAreaId != -1) {
+            Floresta forest = new Floresta();
+
+            forest.setAreaFloresta(Float.parseFloat(map.get("Floresta")));
+            forest.setAreaNaoFloresta(Float.parseFloat(map.get("NaoFloresta")));
+            forest.setAno(Integer.parseInt(this.data.get("ano")));
+            forest.setIdAreaGeografica(geographicalAreaId);
+
+            forestDao.create(forest);
+        }
+    }
+
+    // Insere informações de desmatamentos.
+    private void createDeforestation(Map<String, String> map, int geographicalAreaId) {
+        if (geographicalAreaId == -1)
+            return;
+
+        DesmatamentoDAO deforestationDao = new DesmatamentoDAO(this.connection);
+        FlorestaDAO forestDao = new FlorestaDAO(this.connection);
+        int forestId = forestDao.getForestIdByYearAndGeographicalAreaId(
+                Integer.parseInt(this.data.get("ano")), geographicalAreaId);
+
+        if (forestId != -1) {
+            Desmatamento deforestation = new Desmatamento();
+
+            deforestation.setTaxaIncremento(Float.parseFloat(map.get("Incremento")));
+            deforestation.setAreaDesmatada(Float.parseFloat(map.get("Desmatado" + this.data.get("ano"))));
+            deforestation.setIdFloresta(forestId);
+
+            deforestationDao.create(deforestation);
         }
     }
 

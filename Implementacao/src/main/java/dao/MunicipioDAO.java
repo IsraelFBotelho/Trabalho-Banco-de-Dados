@@ -29,7 +29,8 @@ public class MunicipioDAO implements DAO<Municipio> {
 
             for (Municipio e : models) {
                 Municipio ex = exist.stream().filter(
-                        (x) -> x.getNome().equals(e.getNome().toUpperCase())).findFirst().orElse(null);
+                        (x) -> x.getNome().equals(e.getNome().toUpperCase())
+                                && x.getIdEstado() == e.getIdEstado()).findFirst().orElse(null);
 
                 if (ex == null) {
                     statement.setString(1, e.getNome().toUpperCase());
@@ -52,7 +53,8 @@ public class MunicipioDAO implements DAO<Municipio> {
             String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) VALUES (?, ?);";
             PreparedStatement statement = connection.prepareStatement(SQL);
             Municipio ex = exist.stream().filter(
-                    (x) -> x.getNome().equals(model.getNome().toUpperCase())).findFirst().orElse(null);
+                    (x) -> x.getNome().equals(model.getNome().toUpperCase())
+                            && x.getIdEstado() == model.getIdEstado()).findFirst().orElse(null);
 
             if (ex == null) {
                 statement.setString(1, model.getNome().toUpperCase());
@@ -139,7 +141,7 @@ public class MunicipioDAO implements DAO<Municipio> {
             String SQL = "SELECT id FROM ambiente.municipio WHERE nome = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
-            statement.setString(1, name);
+            statement.setString(1, name.toUpperCase());
 
             ResultSet results = statement.executeQuery();
 

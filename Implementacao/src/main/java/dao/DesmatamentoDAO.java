@@ -22,7 +22,6 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
 
     @Override
     public void create(List<Desmatamento> models) {
-
         List<Desmatamento> exist = this.read();
 
         try {
@@ -30,17 +29,15 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Desmatamento e : models) {
-
                 Desmatamento ex = exist.stream().filter((x) -> x.getIdFloresta() == e.getIdFloresta()).findFirst().orElse(null);
 
-                if(ex == null) {
-
+                if (ex == null) {
                     statement.setFloat(1, e.getTaxaIncremento());
                     statement.setFloat(2, e.getAreaDesmatada());
                     statement.setInt(3, e.getIdFloresta());
                     statement.execute();
-                }else{
-                    this.update(e);
+                } else {
+                    update(e);
                 }
             }
         } catch (SQLException e) {
@@ -50,7 +47,24 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
 
     @Override
     public void create(Desmatamento model) {
+        List<Desmatamento> exist = this.read();
 
+        try {
+            String SQL = "INSERT INTO ambiente.desmatamento (taxa_incremento, area_desmatada, id_floresta) VALUES (?, ?, ?);";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            Desmatamento ex = exist.stream().filter((x) -> x.getIdFloresta() == model.getIdFloresta()).findFirst().orElse(null);
+
+            if (ex == null) {
+                statement.setFloat(1, model.getTaxaIncremento());
+                statement.setFloat(2, model.getAreaDesmatada());
+                statement.setInt(3, model.getIdFloresta());
+                statement.execute();
+            } else {
+                update(model);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -63,9 +77,9 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
 
             while (results.next()) {
                 Desmatamento e = new Desmatamento();
-                e.setTaxaIncremento(results.getFloat(0));
-                e.setAreaDesmatada(results.getFloat(1));
-                e.setIdFloresta(results.getInt(2));
+                e.setTaxaIncremento(results.getFloat(1));
+                e.setAreaDesmatada(results.getFloat(2));
+                e.setIdFloresta(results.getInt(3));
 
                 deforestations.add(e);
             }
@@ -93,15 +107,15 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
         }
     }
 
-    public void update(Desmatamento model){
+    public void update(Desmatamento model) {
         try {
             String SQL = "UPDATE ambiente.desmatamento SET taxa_incremento = ?, area_desmatada = ? WHERE id_floresta = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
-                statement.setFloat(1, model.getTaxaIncremento());
-                statement.setFloat(2, model.getAreaDesmatada());
-                statement.setInt(3, model.getIdFloresta());
-                statement.execute();
+            statement.setFloat(1, model.getTaxaIncremento());
+            statement.setFloat(2, model.getAreaDesmatada());
+            statement.setInt(3, model.getIdFloresta());
+            statement.execute();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
