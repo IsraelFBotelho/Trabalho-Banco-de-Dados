@@ -24,7 +24,6 @@ CREATE TABLE ambiente.municipio (
     nome VARCHAR(100) NOT NULL,
     id_estado INT,
     CONSTRAINT pk_municipio PRIMARY KEY(id),
-    CONSTRAINT uk_municipio_nome UNIQUE(nome),
     CONSTRAINT fk_municipio_estado FOREIGN KEY(id_estado) REFERENCES ambiente.estado(id)
 );
 
