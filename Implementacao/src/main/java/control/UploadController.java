@@ -83,6 +83,8 @@ public class UploadController {
                 headers = csvReader.readNext();
                 headers = csvReader.readNext();
                 headers = csvReader.readNext();
+                headers[0] = "data";
+                headers[1] = "hora";
             } else {
                 String st1 = headers[9].replaceAll("[^0-9]", "");
                 headers[10] = headers[10].replaceAll("[^A-Za-z]", "");
@@ -238,10 +240,35 @@ public class UploadController {
         for (Map<String, String> e : this.csv) {
             MedicaoClima climateMeasurement = new MedicaoClima();
 
-            Date date = Date.valueOf(e.get("DATA (YYYY-MM-DD)"));
-            Time time = Time.valueOf((e.get("HORA (UTC)")) + ":00");
-            float min = Float.parseFloat(e.get("TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)").replaceAll(",", "."));
-            float max = Float.parseFloat(e.get("TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)").replaceAll(",", "."));
+            Date date = Date.valueOf(e.get("data").replaceAll("/","-"));
+
+            Time time;
+
+            if(e.get("hora").length() == 5){
+                time = Time.valueOf((e.get("hora"))+":00");
+            }else{
+                String aux = e.get("hora").replaceAll("[^0-9]", "");
+                aux = aux.substring(0,2) + ':' + aux.substring(2,4);
+                time = Time.valueOf((aux)+":00");
+            }
+
+            String str1;
+            String str2;
+
+            if(e.get("TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)") == ""){
+                str1 = "-9999";
+            }else{
+                str1 = e.get("TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)");
+            }
+
+            if(e.get("TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)") == ""){
+                str2 = "-9999";
+            }else{
+                str2 = e.get("TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)");
+            }
+
+            float min = Float.parseFloat(str1.replaceAll(",", "."));
+            float max = Float.parseFloat(str2.replaceAll(",", "."));
 
             climateMeasurement.setHora(time);
             climateMeasurement.setData(date);
