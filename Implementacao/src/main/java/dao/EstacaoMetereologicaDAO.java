@@ -27,18 +27,27 @@ public class EstacaoMetereologicaDAO implements DAO<EstacaoMetereologica> {
 
     @Override
     public void create(List<EstacaoMetereologica> models) {
+
+        List<EstacaoMetereologica> exist = this.read();
+
         try {
-            String SQL = "INSERT INTO ambiente.estacao_metereologica (codigo, nome, id_municipio) VALUES (?, ?, ?) " +
-                    "ON CONFLICT (codigo) DO UPDATE SET nome = ?, id_municipio = ?;";
+            String SQL = "INSERT INTO ambiente.estacao_metereologica (codigo, nome, id_municipio) VALUES (?, ?, ?) ";
+
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (EstacaoMetereologica e : models) {
-                statement.setString(1, e.getCodigo());
-                statement.setString(2, e.getNome());
-                statement.setInt(3, e.getIdMunicipio());
-                statement.setString(4, e.getNome());
-                statement.setInt(5, e.getIdMunicipio());
-                statement.execute();
+
+                EstacaoMetereologica ex = exist.stream().filter((x) -> x.getCodigo() == e.getCodigo()).findFirst().orElse(null);
+
+                if(ex == null) {
+
+                    statement.setString(1, e.getCodigo());
+                    statement.setString(2, e.getNome());
+                    statement.setInt(3, e.getIdMunicipio());
+                    statement.execute();
+                }else{
+                    this.update(e);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -80,6 +89,21 @@ public class EstacaoMetereologicaDAO implements DAO<EstacaoMetereologica> {
                 statement.setString(3, e.getCodigo());
                 statement.execute();
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void update(EstacaoMetereologica model){
+        try {
+            String SQL = "UPDATE ambiente.estacao_metereologica SET nome = ?, id_municipio = ? WHERE codigo = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+                statement.setString(1, model.getNome());
+                statement.setInt(2, model.getIdMunicipio());
+                statement.setString(3, model.getCodigo());
+                statement.execute();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

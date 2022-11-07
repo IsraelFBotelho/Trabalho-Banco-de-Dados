@@ -86,14 +86,13 @@ public class FlorestaDAO implements DAO<Floresta> {
     public void update(Floresta model) {
         try {
             String SQL = "UPDATE ambiente.floresta " +
-                    "SET area_floresta = ?, area_nao_floresta = ?, ano = ?, id_area_geografica = ? WHERE id = ?;";
+                    "SET area_floresta = ?, area_nao_floresta = ? WHERE ano = ? AND id_area_geografica = ?;";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             statement.setFloat(1, model.getAreaFloresta());
             statement.setFloat(2, model.getAreaNaoFloresta());
             statement.setInt(3, model.getAno());
             statement.setInt(4, model.getIdAreaGeografica());
-            statement.setInt(5, model.getId());
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

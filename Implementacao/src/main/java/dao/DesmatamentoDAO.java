@@ -28,15 +28,26 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
 
     @Override
     public void create(List<Desmatamento> models) {
+
+        List<Desmatamento> exist = this.read();
+
         try {
             String SQL = "INSERT INTO ambiente.desmatamento (taxa_incremento, area_desmatada, id_floresta) VALUES (?, ?, ?);";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Desmatamento e : models) {
-                statement.setFloat(1, e.getTaxaIncremento());
-                statement.setFloat(2, e.getAreaDesmatada());
-                statement.setInt(3, e.getIdFloresta());
-                statement.execute();
+
+                Desmatamento ex = exist.stream().filter((x) -> x.getIdFloresta() == e.getIdFloresta()).findFirst().orElse(null);
+
+                if(ex == null) {
+
+                    statement.setFloat(1, e.getTaxaIncremento());
+                    statement.setFloat(2, e.getAreaDesmatada());
+                    statement.setInt(3, e.getIdFloresta());
+                    statement.execute();
+                }else{
+                    this.update(e);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -78,6 +89,21 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
                 statement.setInt(3, e.getIdFloresta());
                 statement.execute();
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void update(Desmatamento model){
+        try {
+            String SQL = "UPDATE ambiente.desmatamento SET taxa_incremento = ?, area_desmatada = ? WHERE id_floresta = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+                statement.setFloat(1, model.getTaxaIncremento());
+                statement.setFloat(2, model.getAreaDesmatada());
+                statement.setInt(3, model.getIdFloresta());
+                statement.execute();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -27,25 +27,28 @@ public class EstadoDAO implements DAO<Estado> {
 
     @Override
     public void create(List<Estado> models) {
+
+        List<Estado> exist = this.read();
+
         try {
-            String SQL = "INSERT INTO ambiente.estado (sigla, nome, id_regiao) " +
-                    "SELECT ?, ?, ? " +
-                    "WHERE NOT EXISTS (" +
-                    "    SELECT id " +
-                    "    FROM ambiente.estado " +
-                    "    WHERE sigla = ? AND nome = ? AND id_regiao = ?);";
+            String SQL = "INSERT INTO ambiente.estado (sigla, nome, id_regiao) VALUES (?, ?, ?);";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Estado e : models) {
-                if (e.getSigla() != null && e.getNome() != null) {
+
+                Estado ex = exist.stream().filter((x) -> x.getSigla() == e.getSigla()).findFirst().orElse(null);
+
+                if(ex == null) {
+
                     statement.setString(1, e.getSigla().toUpperCase());
                     statement.setString(2, e.getNome().toUpperCase());
                     statement.setInt(3, e.getIdRegiao());
-                    statement.setString(4, e.getSigla().toUpperCase());
-                    statement.setString(5, e.getNome().toUpperCase());
-                    statement.setInt(6, e.getIdRegiao());
+
                     statement.execute();
+                }else {
+                    this.update(e);
                 }
+
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -88,6 +91,21 @@ public class EstadoDAO implements DAO<Estado> {
                 statement.setInt(3, e.getIdRegiao());
                 statement.execute();
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void update(Estado model){
+        try{
+            String SQL = "UPDATE ambiente.estado SET nome = ?, id_regiao = ? WHERE sigla = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+                statement.setString(1, model.getNome());
+                statement.setInt(2, model.getIdRegiao());
+                statement.setString(3, model.getSigla());
+                statement.execute();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

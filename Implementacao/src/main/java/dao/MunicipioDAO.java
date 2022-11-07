@@ -27,22 +27,25 @@ public class MunicipioDAO implements DAO<Municipio> {
 
     @Override
     public void create(List<Municipio> models) {
+
+        List<Municipio> exist = this.read();
+
         try {
-            String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) " +
-                    "SELECT ?, ? " +
-                    "WHERE NOT EXISTS (" +
-                    "    SELECT id " +
-                    "    FROM ambiente.municipio " +
-                    "    WHERE nome = ? AND id_estado = ?);";
+            String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) VALUES (?,?);";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Municipio e : models) {
-                if (e.getNome() != null) {
+
+                Municipio ex = exist.stream().filter((x)-> x.getNome() == e.getNome()).findFirst().orElse(null);
+
+
+                if(ex == null) {
+
                     statement.setString(1, e.getNome().toUpperCase());
                     statement.setInt(2, e.getIdEstado());
-                    statement.setString(3, e.getNome().toUpperCase());
-                    statement.setInt(4, e.getIdEstado());
                     statement.execute();
+                }else{
+                    this.update(e);
                 }
             }
         } catch (SQLException e) {
@@ -85,6 +88,20 @@ public class MunicipioDAO implements DAO<Municipio> {
                 statement.setInt(3, e.getId());
                 statement.execute();
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void update(Municipio model){
+        try {
+            String SQL = "UPDATE ambiente.municipio SET id_estado = ? WHERE nome = ?;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+            statement.setInt(1, model.getIdEstado());
+            statement.setString(2, model.getNome());
+            statement.execute();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
