@@ -28,20 +28,37 @@ public class MedicaoClimaDAO implements DAO<MedicaoClima> {
     @Override
     public void create(List<MedicaoClima> models) {
         try {
+
+            List<MedicaoClima> exist = this.read();
+
             String SQL = "INSERT INTO ambiente.medicao_clima (data, hora, codigo_estacao_metereologica, temperatura_minima, temperatura_maxima)" +
-                    "VALUES (?, ?, ?, ?, ?) ON CONFLICT (data, hora, codigo_estacao_metereologica) " +
-                    "DO UPDATE SET temperatura_minima = ?, temperatura_maxima = ?;";
-            PreparedStatement statement = connection.prepareStatement(SQL);
+                    "VALUES (?, ?, ?, ?, ?)";
+
+
+            String SQLupdate = "UPDATE ambiente.medicao_clima SET temperatura_minima = ?, temperatura_maxima = ? WHERE data = ? AND hora = ? AND codigo_estacao_metereologica = ? ";
+
+            PreparedStatement statement;
 
             for (MedicaoClima e : models) {
-                statement.setDate(1, e.getDt());
-                statement.setTime(2, e.getHora());
-                statement.setString(3, e.getCodigoEstacaoMetereologica());
-                statement.setFloat(4, e.getTemperaturaMinima());
-                statement.setFloat(5, e.getTemperaturaMaxima());
-                statement.setFloat(6, e.getTemperaturaMinima());
-                statement.setFloat(7, e.getTemperaturaMaxima());
-                statement.execute();
+
+                MedicaoClima ex = exist.stream().filter((x) -> x.getHora() == e.getHora() && x.getDt() == e.getDt() && x.getCodigoEstacaoMetereologica() == e.getCodigoEstacaoMetereologica()).findFirst().orElse(null);
+
+                if(ex == null){
+                    statement = connection.prepareStatement(SQL);
+                    statement.setDate(1, e.getDt());
+                    statement.setTime(2, e.getHora());
+                    statement.setString(3, e.getCodigoEstacaoMetereologica());
+                    statement.setFloat(4, e.getTemperaturaMinima());
+                    statement.setFloat(5, e.getTemperaturaMaxima());
+                }else{
+                    statement = connection.prepareStatement(SQLupdate);
+                    statement.setFloat(1, e.getTemperaturaMinima());
+                    statement.setFloat(2, e.getTemperaturaMaxima());
+                    statement.setDate(3, e.getDt());
+                    statement.setTime(4, e.getHora());
+                    statement.setString(5, e.getCodigoEstacaoMetereologica());
+                }
+
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -75,9 +92,11 @@ public class MedicaoClimaDAO implements DAO<MedicaoClima> {
 
     @Override
     public void update(List<MedicaoClima> models) {
+        // do nothing
     }
 
     @Override
     public void delete(String id) {
+        // do nothing
     }
 }

@@ -12,21 +12,21 @@
 
         <div class="card" style="">
             <p:growl id="growl" />
-            <p:dataTable id="tabelaProdutos" var="produto"
+            <p:dataTable id="tabelaProdutos" var="histo"
                          value="#{historicoController.info}"
                          rendered="#{not empty historicoController.info}" >
 
                 <p:column headerText="Nome do Arquivo">
-                    <h:outputText id="nomeInput" value="#{produto.get('nome')}"/>
+                    <h:outputText id="nomeInput" value="#{histo.nome}"/>
                 </p:column>
 
                 <p:column headerText="Data de Upload" >
-                    <h:outputText id="precoInput" value="#{produto.get('data')}"/>
+                    <h:outputText id="data" value="#{histo.data}"/>
 
                 </p:column>
 
                 <p:column headerText="Tipo">
-                    <h:outputText id="quantidadeInput" value="#{produto.get('tipo')}"/>
+                    <h:outputText id="tipo" value="#{histo.tipo}"/>
                 </p:column>
 
             </p:dataTable>
