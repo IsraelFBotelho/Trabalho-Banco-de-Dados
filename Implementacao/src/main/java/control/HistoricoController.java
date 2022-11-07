@@ -1,29 +1,33 @@
 package control;
 
+import dao.HistoricoDAO;
+import models.Historico;
+
 import javax.enterprise.context.RequestScoped;
 import javax.faces.bean.ManagedBean;
 import javax.inject.Named;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Named
 @ManagedBean
 @RequestScoped
 public class HistoricoController {
 
-    public List<Map<String, String>> getInfo() {
+    public List<Historico> getInfo() {
         return info;
     }
 
-    public void setInfo(List<Map<String, String>> info) {
+    public void setInfo(List<Historico> info) {
         this.info = info;
     }
 
-    private List<Map<String,String>> info;
+    private List<Historico> info;
 
     public void get(){
         System.out.println("ativou");
-//        Dao para buscar as info do historico
+        HistoricoDAO dao = new HistoricoDAO();
+        info = dao.read();
     }
 
 }

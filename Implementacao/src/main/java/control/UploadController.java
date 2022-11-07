@@ -2,9 +2,11 @@ package control;
 
 import com.opencsv.CSVReader;
 import dao.EstadoDAO;
+import dao.HistoricoDAO;
 import dao.RegiaoDAO;
 import jdbc.PgConnectionFactory;
 import models.Estado;
+import models.Historico;
 import models.Regiao;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
@@ -21,6 +23,7 @@ import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -88,6 +91,15 @@ public class UploadController {
 
                 this.csv.add(campos);
             }
+            HistoricoDAO dao = new HistoricoDAO();
+            List<Historico> list = new ArrayList<>();
+            Historico e = new Historico();
+            e.setTipo(this.type);
+            Date date = new Date(System.currentTimeMillis());
+            e.setData(date);
+            e.setNome(this.file.getFileName());
+            list.add(e);
+            dao.create(list);
         } catch (Exception e) {
             e.printStackTrace();
         }
