@@ -25,7 +25,6 @@ public class HistoricoController {
     private List<Historico> info;
 
     public void get(){
-        System.out.println("ativou");
         HistoricoDAO dao = new HistoricoDAO();
         info = dao.read();
     }

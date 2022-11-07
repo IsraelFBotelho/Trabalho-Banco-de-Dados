@@ -54,7 +54,7 @@ public class UploadController {
         try {
             CSVReader csvReader = new CSVReader(
                     new InputStreamReader(
-                            new ByteArrayInputStream(file.getContent())), ';');
+                            new ByteArrayInputStream(file.getContent()),"ISO-8859-1"), ';');
 
             this.csv = new ArrayList<Map<String, String>>();
 
@@ -91,6 +91,7 @@ public class UploadController {
 
                 this.csv.add(campos);
             }
+
             HistoricoDAO dao = new HistoricoDAO();
             List<Historico> list = new ArrayList<>();
             Historico e = new Historico();
@@ -162,6 +163,10 @@ public class UploadController {
 
     public void setDropZoneText(String dropZoneText) {
         this.dropZoneText = dropZoneText;
+    }
+
+    private void insert(){
+
     }
 
 }
