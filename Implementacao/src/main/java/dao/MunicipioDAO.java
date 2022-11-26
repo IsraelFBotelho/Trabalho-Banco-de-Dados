@@ -1,10 +1,9 @@
 package dao;
 
 import interfaces.DAO;
-import jdbc.PgConnectionFactory;
 import models.Municipio;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -84,6 +83,27 @@ public class MunicipioDAO implements DAO<Municipio> {
                 e.setIdEstado(results.getInt(3));
 
                 cities.add(e);
+            }
+
+            return cities;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> readEstacao(){
+        try {
+            String SQL = "SELECT m.nome FROM ambiente.municipio m\n" +
+                         "WHERE (SELECT t.id_municipio FROM ambiente.estacao_metereologica t) = m.id";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            ResultSet results = statement.executeQuery();
+            List<String> cities = new ArrayList<>();
+
+            while (results.next()) {
+                String nome = results.getString(1);
+                nome = nome.toLowerCase();
+                String aux = StringUtils.capitalize(nome);
+                cities.add(aux);
             }
 
             return cities;
