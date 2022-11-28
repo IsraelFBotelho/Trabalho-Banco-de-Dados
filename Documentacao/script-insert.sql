@@ -63,10 +63,10 @@ VALUES
 -- Medição clima
 INSERT INTO
     ambiente.medicao_clima (
-        dt,
+        data,
         hora,
         codigo_estacao_metereologica,
-        temperatura_minina,
+        temperatura_minima,
         temperatura_maxima
     )
 VALUES
