@@ -2,7 +2,6 @@ package control;
 
 import dao.MunicipioDAO;
 import jdbc.PgConnectionFactory;
-import models.Municipio;
 import org.primefaces.model.charts.ChartData;
 import org.primefaces.model.charts.line.LineChartDataSet;
 import org.primefaces.model.charts.line.LineChartModel;
@@ -17,20 +16,18 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Named
 @ManagedBean
 @RequestScoped
 public class RelatoriosController {
-
     private Connection connection = null;
 
     private String tipo;
     private String regiao;
 
-    private List<String> citys;
+    private List<String> cities;
 
     private LineChartModel lineModel;
 
@@ -44,7 +41,7 @@ public class RelatoriosController {
         this.lastSelected = lastSelected;
     }
 
-    public boolean testLastSelected(){
+    public boolean testLastSelected() {
         System.out.println(this.lastSelected);
         return this.lastSelected != null;
     }
@@ -68,12 +65,12 @@ public class RelatoriosController {
 
     private String lastSelected;
 
-    public List<String> getCitys() {
-        return this.citys;
+    public List<String> getCities() {
+        return this.cities;
     }
 
-    public void setCitys(List<String> citys) {
-        this.citys = citys;
+    public void setCities(List<String> cities) {
+        this.cities = cities;
     }
 
     public LineChartModel getLineModel() {
@@ -84,7 +81,7 @@ public class RelatoriosController {
     public void init() {
         this.setConnection();
         MunicipioDAO dao = new MunicipioDAO(this.connection);
-        this.citys = dao.readEstacao();
+        this.cities = dao.readCities();
 
         createLineModel();
     }
@@ -92,8 +89,6 @@ public class RelatoriosController {
     private void createLineModel() {
         lineModel = new LineChartModel();
         ChartData data = new ChartData();
-
-
 
         LineChartDataSet dataSet = new LineChartDataSet();
         List<Object> values = new ArrayList<>();
@@ -123,7 +118,7 @@ public class RelatoriosController {
         labels.add("July");
         data.setLabels(labels);
 
-        //Options
+        // Options
         LineChartOptions options = new LineChartOptions();
         Title title = new Title();
         title.setDisplay(true);
@@ -132,7 +127,6 @@ public class RelatoriosController {
 
         lineModel.setOptions(options);
         lineModel.setData(data);
-
     }
 
     private void setConnection() {
@@ -143,6 +137,4 @@ public class RelatoriosController {
             throw new RuntimeException(e);
         }
     }
-
-
 }

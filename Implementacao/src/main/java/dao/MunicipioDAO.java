@@ -91,17 +91,17 @@ public class MunicipioDAO implements DAO<Municipio> {
         }
     }
 
-    public List<String> readEstacao(){
+    public List<String> readCities() {
         try {
-            String SQL = "SELECT m.nome FROM ambiente.municipio m\n" +
-                         "WHERE (SELECT t.id_municipio FROM ambiente.estacao_metereologica t) = m.id";
+            String SQL = "SELECT m.nome FROM ambiente.estacao_metereologica em " +
+                    "INNER JOIN ambiente.municipio m " +
+                    "ON em.id_municipio = m.id;";
             PreparedStatement statement = connection.prepareStatement(SQL);
             ResultSet results = statement.executeQuery();
             List<String> cities = new ArrayList<>();
 
             while (results.next()) {
-                String nome = results.getString(1);
-                nome = nome.toLowerCase();
+                String nome = results.getString(1).toLowerCase();
                 String aux = StringUtils.capitalize(nome);
                 cities.add(aux);
             }
