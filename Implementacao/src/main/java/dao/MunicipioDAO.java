@@ -102,8 +102,7 @@ public class MunicipioDAO implements DAO<Municipio> {
 
             while (results.next()) {
                 String nome = results.getString(1).toLowerCase();
-                String aux = StringUtils.capitalize(nome);
-                cities.add(aux);
+                cities.add(StringUtils.capitalize(nome));
             }
 
             return cities;
