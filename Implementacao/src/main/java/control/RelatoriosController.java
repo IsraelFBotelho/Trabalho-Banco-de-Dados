@@ -14,6 +14,7 @@ import org.primefaces.model.charts.optionconfig.title.Title;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import java.io.IOException;
 import java.sql.Connection;
@@ -101,8 +102,8 @@ public class RelatoriosController {
         this.createLineModel(this.lastSelected);
     }
 
-    public void hermes() {
-        System.out.println("Atulizando cidade <3");
+    public void handleChange() {
+        System.out.println("Atualizando cidades.");
     }
 
     private void createLineModel(String cityName) {

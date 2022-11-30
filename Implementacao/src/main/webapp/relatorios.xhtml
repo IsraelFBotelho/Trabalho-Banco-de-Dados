@@ -21,6 +21,7 @@
                                 icon="pi pi-chart-line"/>
                     <p:menuitem value="Geral" action="#{relatoriosController.setTipo('G')}" update="c"
                                 icon="pi pi-chart-line"/>
+                    
                     Media das taxas de desmatamento no ano x media da terperatura maxima no ano
                 </p:menuButton>
 
@@ -28,8 +29,7 @@
                           style="position: relative; bottom: -5px;background-color: #A8A8A8; margin-left: 10px;margin-right: 10px"/>
 
                 <p:selectOneMenu id="option" value="#{relatoriosController.lastSelected}"
-                                 rendered="#{relatoriosController.tipo eq 'C'}"
-                                 onchange="#{relatoriosController.hermes()}">
+                                 rendered="#{relatoriosController.tipo eq 'C'}">
                     <f:selectItem itemLabel="Escolha uma cidade" itemValue=""/>
                     <f:selectItems value="#{relatoriosController.cities}"/>
                 </p:selectOneMenu>
