@@ -8,39 +8,47 @@
 
     <ui:define name="pagina">
         <p:growl id="messages" showDetail="true"/>
+        <h1>UNDER DEVELOPMENT ;)</h1>
 
         <div class="card">
-            <h1>UNDER DEVELOPMENT ;)</h1>
             <h:form id="c">
+                <p:messages>
+                    <p:autoUpdate />
+                </p:messages>
                 <p:menuButton value="Tipo de Gráfico">
-                    <!--                    <p:menuitem value="Cidade" action="#{relatoriosController.setTipo('C')}" update="c"-->
-                    <!--                                icon="pi pi-chart-line"/>-->
-
                     <p:menuitem value="#{relatoriosController.cities}" />
                     <p:menuitem value="Cidade" action="#{relatoriosController.renderCity}" update="c"
                                 icon="pi pi-chart-line"/>
                     <p:menuitem value="Geral" action="#{relatoriosController.setTipo('G')}" update="c"
                                 icon="pi pi-chart-line"/>
-
                     Media das taxas de desmatamento no ano x media da terperatura maxima no ano
                 </p:menuButton>
+
 
                 <p:spacer width="1" height="22" rendered="#{relatoriosController.tipo eq 'C'}"
                           style="position: relative; bottom: -5px;background-color: #A8A8A8; margin-left: 10px;margin-right: 10px"/>
 
-                <p:selectOneMenu id="option" value="#{relatoriosController.lastSelected}"
+                <p:selectOneMenu id="option" value="#{relatoriosController.city}" style="margin-bottom: 9px"
                                  rendered="#{relatoriosController.tipo eq 'C'}">
-
+                    <p:ajax event="change" process="@this" />
                     <f:selectItem itemLabel="Escolha uma cidade" itemValue=""/>
-                    <f:selectItems value="#{relatoriosController.cities}"/>
-                    <p:ajax update="#{relatoriosController.lastSelected}" listener="#{relatoriosController.handleOnClick}" />
+                    <f:selectItems value="#{relatoriosController.cities}" var="city"
+                                    itemValue="#{city}"/>
                 </p:selectOneMenu>
 
                 <p:spacer width="1" height="22" rendered="#{relatoriosController.tipo eq 'C'}"
                           style="position: relative; bottom: -5px;background-color: #A8A8A8; margin-left: 10px;margin-right: 10px"/>
 
-                <p:commandButton type="button" value="Gerar gráfico" ajax="false" action="#{relatoriosController.handleOnClick()}"
-                                 rendered="#{relatoriosController.tipo eq 'C'}"/>
+                <p:commandButton value="Submit" update="display" oncomplete="PF('dlg').show()" icon="pi pi-check" rendered="#{relatoriosController.tipo eq 'C'}" />
+
+                <p:dialog header="Values" modal="true" showEffect="bounce" widgetVar="dlg" resizable="false">
+                    <p:panelGrid columns="2" id="display" columnClasses="label,value">
+                        <h:outputText value="Cidade:" />
+                        <h:outputText value="#{relatoriosController.city}" />
+                    </p:panelGrid>
+                </p:dialog>
+
+
 
 <!--                <div class="card">-->
 <!--                    <p:lineChart model="#{relatoriosController.lineModel}"-->

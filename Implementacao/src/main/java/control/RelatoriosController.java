@@ -13,28 +13,43 @@ import org.primefaces.model.charts.optionconfig.title.Title;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
 import javax.inject.Named;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Named
 @ManagedBean
-@RequestScoped
-public class RelatoriosController {
+@ViewScoped
+public class RelatoriosController implements Serializable {
     private Connection connection = null;
     private String tipo;
     private String regiao;
-    private List<String> cities = new ArrayList<>();
+    private String city;
+    private List<String> cities;
     private LineChartModel lineModel;
     private LineChartModel cartesianLinerModel;
-    private String lastSelected = null;
+
+
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+    public String getCity() {
+        return city;
+    }
 
     private void setConnection() {
         try {
@@ -43,19 +58,6 @@ public class RelatoriosController {
         } catch (IOException | SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public String getLastSelected() {
-        return lastSelected;
-    }
-
-    public void setLastSelected(String lastSelected) {
-        this.lastSelected = lastSelected;
-    }
-
-    public boolean testLastSelected() {
-        System.out.println(this.lastSelected);
-        return this.lastSelected != null;
     }
 
     public String getRegiao() {
@@ -92,37 +94,27 @@ public class RelatoriosController {
     }
 
     private void getAllCities() {
-        if (this.cities.isEmpty()) {
+        if (this.cities == null || this.cities.isEmpty()) {
             MunicipioDAO citiesDao = new MunicipioDAO(this.connection);
             this.cities = citiesDao.readCities();
         }
     }
 
+    public void gerarGrafico(){
+        System.out.println("set "+city);
+    }
+
     public void renderCity() {
         this.tipo = "C";
         this.getAllCities();
-        this.createLineModel(this.lastSelected);
-    }
-
-    public void handleOnClick() {
-        System.out.println("Clicked!");
-        FacesMessage message = new FacesMessage("Successful");
-        FacesContext.getCurrentInstance().addMessage(null, message);
-//        if (this.lastSelected != null) {
-//            if (this.lastSelected.equals("Escolha uma cidade")) {
-//                System.out.println(this.lastSelected);
-//                return;
-//            }
-//
-//            System.out.println("Cidade: " + this.lastSelected);
-//        } else System.out.println("Null!");
+        this.createLineModel(this.city);
     }
 
     private void createLineModel(String cityName) {
         lineModel = new LineChartModel();
         ChartData data = new ChartData();
 
-        if (this.lastSelected != null) {
+        if (this.city != null) {
             MedicaoClimaDAO weatherDao = new MedicaoClimaDAO(this.connection);
             List<TemperatureDataDTO> temperatureData = weatherDao.readTemperatureData(cityName);
 
