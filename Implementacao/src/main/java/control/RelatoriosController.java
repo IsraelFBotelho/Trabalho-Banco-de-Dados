@@ -13,7 +13,9 @@ import org.primefaces.model.charts.optionconfig.title.Title;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import java.io.IOException;
@@ -32,7 +34,7 @@ public class RelatoriosController {
     private List<String> cities = new ArrayList<>();
     private LineChartModel lineModel;
     private LineChartModel cartesianLinerModel;
-    private String lastSelected;
+    private String lastSelected = null;
 
     private void setConnection() {
         try {
@@ -102,8 +104,18 @@ public class RelatoriosController {
         this.createLineModel(this.lastSelected);
     }
 
-    public void handleChange() {
-        System.out.println("Atualizando cidades.");
+    public void handleOnClick() {
+        System.out.println("Clicked!");
+        FacesMessage message = new FacesMessage("Successful");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+//        if (this.lastSelected != null) {
+//            if (this.lastSelected.equals("Escolha uma cidade")) {
+//                System.out.println(this.lastSelected);
+//                return;
+//            }
+//
+//            System.out.println("Cidade: " + this.lastSelected);
+//        } else System.out.println("Null!");
     }
 
     private void createLineModel(String cityName) {

@@ -12,16 +12,16 @@
         <div class="card">
             <h1>UNDER DEVELOPMENT ;)</h1>
             <h:form id="c">
-
                 <p:menuButton value="Tipo de Gráfico">
                     <!--                    <p:menuitem value="Cidade" action="#{relatoriosController.setTipo('C')}" update="c"-->
                     <!--                                icon="pi pi-chart-line"/>-->
 
+                    <p:menuitem value="#{relatoriosController.cities}" />
                     <p:menuitem value="Cidade" action="#{relatoriosController.renderCity}" update="c"
                                 icon="pi pi-chart-line"/>
                     <p:menuitem value="Geral" action="#{relatoriosController.setTipo('G')}" update="c"
                                 icon="pi pi-chart-line"/>
-                    
+
                     Media das taxas de desmatamento no ano x media da terperatura maxima no ano
                 </p:menuButton>
 
@@ -30,19 +30,27 @@
 
                 <p:selectOneMenu id="option" value="#{relatoriosController.lastSelected}"
                                  rendered="#{relatoriosController.tipo eq 'C'}">
+
                     <f:selectItem itemLabel="Escolha uma cidade" itemValue=""/>
                     <f:selectItems value="#{relatoriosController.cities}"/>
+                    <p:ajax update="#{relatoriosController.lastSelected}" listener="#{relatoriosController.handleOnClick}" />
                 </p:selectOneMenu>
 
-                <div class="card">
-                    <p:lineChart model="#{relatoriosController.lineModel}"
-                                 rendered="#{relatoriosController.tipo eq 'G'}" style="width: 100%; height: 500px;"/>
-                </div>
+                <p:spacer width="1" height="22" rendered="#{relatoriosController.tipo eq 'C'}"
+                          style="position: relative; bottom: -5px;background-color: #A8A8A8; margin-left: 10px;margin-right: 10px"/>
 
-                <div class="card">
-                    <p:lineChart model="#{relatoriosController.lineModel}"
-                                 rendered="#{relatoriosController.tipo eq 'C'}" style="width: 100%; height: 500px;"/>
-                </div>
+                <p:commandButton type="button" value="Gerar gráfico" ajax="false" action="#{relatoriosController.handleOnClick()}"
+                                 rendered="#{relatoriosController.tipo eq 'C'}"/>
+
+<!--                <div class="card">-->
+<!--                    <p:lineChart model="#{relatoriosController.lineModel}"-->
+<!--                                 rendered="#{relatoriosController.tipo eq 'G'}" style="width: 100%; height: 500px;"/>-->
+<!--                </div>-->
+
+<!--                <div class="card">-->
+<!--                    <p:lineChart model="#{relatoriosController.lineModel}"-->
+<!--                                 rendered="#{relatoriosController.tipo eq 'C'}" style="width: 100%; height: 500px;"/>-->
+<!--                </div>-->
             </h:form>
         </div>
 
