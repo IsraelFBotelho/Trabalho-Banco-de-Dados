@@ -93,8 +93,7 @@ public class MedicaoClimaDAO implements DAO<MedicaoClima> {
                     "FROM ambiente.medicao_clima mc INNER JOIN ambiente.estacao_metereologica em " +
                     "ON mc.codigo_estacao_metereologica = em.codigo INNER JOIN ambiente.municipio m " +
                     "ON em.id_municipio = m.id " +
-                    "WHERE em.id_municipio = (" +
-                    "SELECT id_municipio FROM ambiente.estacao_metereologica WHERE LOWER(nome) = ?) " +
+                    "WHERE LOWER(m.nome) = ? " +
                     "GROUP BY em.id_municipio, m.nome, EXTRACT(YEAR FROM mc.data), EXTRACT(MONTH FROM mc.data)" +
                     "ORDER BY EXTRACT(YEAR FROM mc.data), EXTRACT(MONTH FROM mc.data);";
             PreparedStatement statement = connection.prepareStatement(SQL);
@@ -115,6 +114,41 @@ public class MedicaoClimaDAO implements DAO<MedicaoClima> {
                 temperature.setMax(results.getFloat(6));
                 temperature.setMinAvg(results.getFloat(7));
                 temperature.setMin(results.getFloat(8));
+                temperatures.add(temperature);
+            }
+
+            return temperatures;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<TemperatureDataDTO> readTemperatureDataYearOnly(String cityName) {
+        try {
+            String SQL = "SELECT EXTRACT(YEAR FROM mc.data), em.id_municipio, m.nome, AVG(mc.temperatura_maxima), " +
+                    "MAX(mc.temperatura_maxima), AVG(mc.temperatura_minima), MIN(mc.temperatura_minima) " +
+                    "FROM ambiente.medicao_clima mc INNER JOIN ambiente.estacao_metereologica em " +
+                    "ON mc.codigo_estacao_metereologica = em.codigo INNER JOIN ambiente.municipio m ON em.id_municipio = m.id " +
+                    "WHERE LOWER(m.nome) = ? GROUP BY em.id_municipio, m.nome, EXTRACT(YEAR FROM mc.data) " +
+                    "ORDER BY EXTRACT(YEAR FROM mc.data);";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+            statement.setString(1, cityName.toLowerCase());
+
+            ResultSet results = statement.executeQuery();
+            List<TemperatureDataDTO> temperatures = new ArrayList<>();
+
+            while (results.next()) {
+                TemperatureDataDTO temperature = new TemperatureDataDTO();
+
+                temperature.setYear(results.getInt(1));
+                temperature.setMonth(0);
+                temperature.setCityId(results.getInt(2));
+                temperature.setCityName(results.getString(3));
+                temperature.setMaxAvg(results.getFloat(4));
+                temperature.setMax(results.getFloat(5));
+                temperature.setMinAvg(results.getFloat(6));
+                temperature.setMin(results.getFloat(7));
                 temperatures.add(temperature);
             }
 

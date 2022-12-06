@@ -21,39 +21,44 @@
                                 icon="pi pi-chart-line"/>
                     <p:menuitem value="Desmatado" action="#{relatoriosController.setType('D')}" update="c"
                                 icon="pi pi-chart-line"/>
-                    Media das taxas de desmatamento no ano x media da terperatura maxima no ano
+                    Média das taxas de desmatamento no ano Vs. Média da temperatura máxima no ano
                 </p:menuButton>
 
-                <p:spacer width="1" height="22" rendered="#{relatoriosController.type eq 'T' or relatoriosController.type eq 'D'}"
+                <p:spacer width="1" height="22"
+                          rendered="#{relatoriosController.type eq 'T' or relatoriosController.type eq 'D' or relatoriosController.type eq 'R'}"
                           style="position: relative; bottom: -5px;background-color: #A8A8A8; margin-left: 10px;margin-right: 10px"/>
 
-                <p:selectOneMenu id="option" value="#{relatoriosController.city}" style="margin-bottom: 9px"
-                                 rendered="#{relatoriosController.type eq 'T'}">
-
-                    <p:ajax event="change" update="chartCity" listener="#{relatoriosController.renderCity()}"/>
+                <!--                TEMPERATURA-->
+                <p:selectOneMenu id="option_temperature" value="#{relatoriosController.temperatureCity}"
+                                 style="margin-bottom: 9px"
+                                 rendered="#{relatoriosController.type eq 'T' or relatoriosController.type eq 'R'}">
+                    <p:ajax event="change" update="chart_one" listener="#{relatoriosController.renderTemperature()}"/>
                     <f:selectItem itemLabel="Escolha uma cidade" itemValue=""/>
-                    <f:selectItems value="#{relatoriosController.cities}" var="city"
-                                   itemValue="#{city}"/>
+                    <f:selectItems value="#{relatoriosController.temperatureCities}" var="city" itemValue="#{city}"/>
                 </p:selectOneMenu>
 
-                <p:selectOneMenu id="option_des" value="#{relatoriosController.cityDesmatado}" style="margin-bottom: 9px"
-                                 rendered="#{relatoriosController.type eq 'D'}">
-
-                    <p:ajax event="change" update="chartCity" listener="#{relatoriosController.renderCityDesmatado()}"/>
+                <!--                DESMATAMENTO-->
+                <p:selectOneMenu id="option_deforestation" value="#{relatoriosController.deforestationCity}"
+                                 style="margin-bottom: 9px"
+                                 rendered="#{relatoriosController.type eq 'D' or relatoriosController.type eq 'R'}">
+                    <p:ajax event="change" update="chart_two" listener="#{relatoriosController.renderDeforestation()}"/>
                     <f:selectItem itemLabel="Escolha uma cidade" itemValue=""/>
-                    <f:selectItems value="#{relatoriosController.citiesDemastado}" var="city"
+                    <f:selectItems value="#{relatoriosController.deforestationCities}" var="city"
                                    itemValue="#{city}"/>
                 </p:selectOneMenu>
-
 
                 <div class="card">
-                    <p:lineChart model="#{relatoriosController.lineModel}" id="chartCity"
-                                 rendered="#{relatoriosController.type eq 'T' or relatoriosController.type eq 'D' or relatoriosController.type eq 'R'}"
+                    <p:lineChart model="#{relatoriosController.lineModel}" id="chart_one"
+                                 rendered="#{relatoriosController.type eq 'T' or relatoriosController.type eq 'R'}"
                                  style="width: 100%; height: 500px;"/>
                 </div>
 
+                <div class="card">
+                    <p:lineChart model="#{relatoriosController.lineModel2}" id="chart_two"
+                                 rendered="#{relatoriosController.type eq 'D' or relatoriosController.type eq 'R'}"
+                                 style="width: 100%; height: 500px;"/>
+                </div>
             </h:form>
         </div>
-
     </ui:define>
 </ui:composition>

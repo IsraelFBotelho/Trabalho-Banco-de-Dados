@@ -1,14 +1,13 @@
 package control;
 
+import dao.DesmatamentoDAO;
 import dao.MedicaoClimaDAO;
 import dao.MunicipioDAO;
+import dto.DeforestationDataDTO;
 import dto.TemperatureDataDTO;
 import enums.Months;
 import jdbc.PgConnectionFactory;
-import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.charts.ChartData;
-import org.primefaces.model.charts.axes.cartesian.CartesianScales;
-import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
 import org.primefaces.model.charts.line.LineChartDataSet;
 import org.primefaces.model.charts.line.LineChartModel;
 import org.primefaces.model.charts.line.LineChartOptions;
@@ -30,37 +29,44 @@ public class RelatoriosController implements Serializable {
     private Connection connection = null;
     private String type;
     private String regiao;
-    private String city = null;
-    private List<String> cities;
-
-    private String cityDesmatado;
-
-    public String getCityDesmatado() {
-        return cityDesmatado;
-    }
-
-    public void setCityDesmatado(String cityDesmatado) {
-        this.cityDesmatado = cityDesmatado;
-    }
-
-    public List<String> getCitiesDemastado() {
-        return citiesDemastado;
-    }
-
-    public void setCitiesDemastado(List<String> citiesDemastado) {
-        this.citiesDemastado = citiesDemastado;
-    }
-
-    private List<String> citiesDemastado;
+    private String temperatureCity = null;
+    private List<String> temperatureCities;
+    private String deforestationCity = null;
+    private List<String> deforestationCities;
     private LineChartModel lineModel = new LineChartModel();
+    private LineChartModel lineModel2 = new LineChartModel();
 
-    public String getCity() {
-        return city;
+    public LineChartModel getLineModel2() {
+        return lineModel2;
     }
 
-    public void setCity(String city) {
-        if (city.equals("")) this.city = null;
-        else this.city = city;
+    public void setLineModel2(LineChartModel lineModel2) {
+        this.lineModel2 = lineModel2;
+    }
+
+    public String getDeforestationCity() {
+        return deforestationCity;
+    }
+
+    public void setDeforestationCity(String deforestationCity) {
+        this.deforestationCity = deforestationCity;
+    }
+
+    public List<String> getDeforestationCities() {
+        return deforestationCities;
+    }
+
+    public void setDeforestationCities(List<String> deforestationCities) {
+        this.deforestationCities = deforestationCities;
+    }
+
+    public String getTemperatureCity() {
+        return temperatureCity;
+    }
+
+    public void setTemperatureCity(String temperatureCity) {
+        if (temperatureCity.equals("")) this.temperatureCity = null;
+        else this.temperatureCity = temperatureCity;
     }
 
     private void setConnection() {
@@ -86,19 +92,24 @@ public class RelatoriosController implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+        this.clearAll();
+        this.getAllCities();
+    }
+
+    private void clearAll() {
         this.lineModel = new LineChartModel();
-        this.city = null;
-        this.cityDesmatado = null;
-
-        if (this.type.equals("T")) this.getAllCities();
+        this.lineModel2 = new LineChartModel();
+        this.temperatureCity = null;
+        this.deforestationCity = null;
+        this.temperatureCities = null;
     }
 
-    public List<String> getCities() {
-        return this.cities;
+    public List<String> getTemperatureCities() {
+        return this.temperatureCities;
     }
 
-    public void setCities(List<String> cities) {
-        this.cities = cities;
+    public void setTemperatureCities(List<String> temperatureCities) {
+        this.temperatureCities = temperatureCities;
     }
 
     public LineChartModel getLineModel() {
@@ -111,97 +122,55 @@ public class RelatoriosController implements Serializable {
     }
 
     private void getAllCities() {
-        if (this.cities == null || this.cities.isEmpty()) {
-            MunicipioDAO citiesDao = new MunicipioDAO(this.connection);
-            this.cities = citiesDao.readCities();
+        MunicipioDAO citiesDao = new MunicipioDAO(this.connection);
+
+        if (this.type.equals("T")) this.temperatureCities = citiesDao.readTemperatureCities();
+        else if (this.type.equals("D")) this.deforestationCities = citiesDao.readDeforestationCities();
+        else if (this.type.equals("R")) {
+            this.temperatureCities = citiesDao.readTemperatureCities();
+            this.deforestationCities = citiesDao.readDeforestationCities();
         }
     }
 
-    public void renderCity() {
-        if (this.city != null) {
-            System.out.println("Generating graphics for city " + this.city);
-
-            this.createLineModel();
-        } else this.lineModel = new LineChartModel();
-    }
-
-    public void renderCityDesmatado() {
-        if (this.city != null) {
-            System.out.println("Generating graphics for city " + this.city);
-
-            this.createLineModelDesmatado();
-        } else this.lineModel = new LineChartModel();
-    }
-
-    private void createLineModel() {
-        ChartData data = new ChartData();
-        LineChartDataSet dataSet2 = new LineChartDataSet();
-        MedicaoClimaDAO weatherDao = new MedicaoClimaDAO(this.connection);
-        List<TemperatureDataDTO> temperatureData = weatherDao.readTemperatureData(this.city);
-        List<Object> maxAvgValues = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
-        Months[] month = Months.values();
-
-        for (var e : temperatureData) {
-            labels.add(generateLabel(e.getYear(), month[e.getMonth() - 1].getValue()));
-            maxAvgValues.add(e.getMaxAvg());
+    public void renderTemperature() {
+        if (this.temperatureCity == null) {
+            this.lineModel = new LineChartModel();
+            return;
         }
 
-        dataSet2.setData(maxAvgValues);
-        dataSet2.setLabel("Média máxima");
-        dataSet2.setFill(false);
-        dataSet2.setBorderColor("rgb(255, 0, 0)");
-        dataSet2.setTension(0.1);
-
-
-        data.addChartDataSet(dataSet2);
-        data.setLabels(labels);
-        lineModel.setData(data);
-
-        LineChartOptions options = new LineChartOptions();
-
-        Title title = new Title();
-        title.setDisplay(true);
-        title.setText(this.city);
-        options.setTitle(title);
-
-        lineModel.setOptions(options);
+        this.createTemperatureChart();
     }
 
-    private void createLineModelDesmatado() {
+    public void renderDeforestation() {
+        if (this.deforestationCity == null) {
+            this.lineModel2 = new LineChartModel();
+            return;
+        }
 
-        // Area Desmatada por ano
+        this.createDeforestationChart();
+    }
 
+    private void createTemperatureChart() {
         ChartData data = new ChartData();
         LineChartDataSet dataSet = new LineChartDataSet();
-        LineChartDataSet dataSet2 = new LineChartDataSet();
         MedicaoClimaDAO weatherDao = new MedicaoClimaDAO(this.connection);
-        List<TemperatureDataDTO> temperatureData = weatherDao.readTemperatureData(this.city);
-        List<Object> maxAvgValues = new ArrayList<>();
-        List<Object> teste = new ArrayList<>();
+        List<TemperatureDataDTO> temperatureData = weatherDao.readTemperatureData(this.temperatureCity);
+        List<Object> maxValues = new ArrayList<>();
         List<String> labels = new ArrayList<>();
         Months[] month = Months.values();
 
         for (var e : temperatureData) {
             labels.add(generateLabel(e.getYear(), month[e.getMonth() - 1].getValue()));
-            maxAvgValues.add(e.getMaxAvg());
+            maxValues.add(e.getMax());
         }
 
-        teste.add(12);
-        teste.add(15);
-        teste.add(12);
-        teste.add(15);
-        dataSet.setData(teste);
-
-        dataSet2.setData(maxAvgValues);
-        dataSet2.setLabel("Média máxima");
-        dataSet2.setFill(false);
-        dataSet2.setBorderColor("rgb(255, 0, 0)");
-        dataSet2.setTension(0.1);
-
+        dataSet.setData(maxValues);
+        dataSet.setLabel("Temperatura máxima");
+        dataSet.setFill(false);
+        dataSet.setBorderColor("rgb(200, 0, 0)");
+        dataSet.setTension(0.1);
 
         data.addChartDataSet(dataSet);
-        data.addChartDataSet(dataSet2);
         data.setLabels(labels);
         lineModel.setData(data);
 
@@ -209,10 +178,43 @@ public class RelatoriosController implements Serializable {
 
         Title title = new Title();
         title.setDisplay(true);
-        title.setText(this.city);
+        title.setText(this.temperatureCity);
         options.setTitle(title);
 
         lineModel.setOptions(options);
+    }
+
+    private void createDeforestationChart() {
+        ChartData data = new ChartData();
+        LineChartDataSet dataSet = new LineChartDataSet();
+        DesmatamentoDAO dao = new DesmatamentoDAO(this.connection);
+        List<DeforestationDataDTO> deforestationData = dao.readDeforestationData(this.deforestationCity);
+        List<Object> values = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+
+        for (var e : deforestationData) {
+            labels.add(String.valueOf(e.getYear()));
+            values.add(e.getDeforestation());
+        }
+
+        dataSet.setData(values);
+        dataSet.setLabel("Taxa de desmatamento");
+        dataSet.setFill(false);
+        dataSet.setBorderColor("rgb(0, 0, 200)");
+        dataSet.setTension(0.1);
+
+        data.addChartDataSet(dataSet);
+        data.setLabels(labels);
+        lineModel2.setData(data);
+
+        LineChartOptions options = new LineChartOptions();
+
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText(this.deforestationCity);
+        options.setTitle(title);
+
+        lineModel2.setOptions(options);
     }
 
     private String generateLabel(int year, String monthName) {

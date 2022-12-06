@@ -1,5 +1,6 @@
 package dao;
 
+import dto.DeforestationDataDTO;
 import interfaces.DAO;
 import jdbc.PgConnectionFactory;
 import models.Desmatamento;
@@ -73,7 +74,7 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
             String SQL = "SELECT * FROM ambiente.desmatamento;";
             PreparedStatement statement = connection.prepareStatement(SQL);
             ResultSet results = statement.executeQuery();
-            List<Desmatamento> deforestations = new ArrayList<>();
+            List<Desmatamento> deforestation = new ArrayList<>();
 
             while (results.next()) {
                 Desmatamento e = new Desmatamento();
@@ -81,10 +82,40 @@ public class DesmatamentoDAO implements DAO<Desmatamento> {
                 e.setAreaDesmatada(results.getFloat(2));
                 e.setIdFloresta(results.getInt(3));
 
-                deforestations.add(e);
+                deforestation.add(e);
             }
 
-            return deforestations;
+            return deforestation;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<DeforestationDataDTO> readDeforestationData(String cityName) {
+        try {
+            String SQL = "SELECT d.area_desmatada, f.ano, m.nome " +
+                    "FROM ambiente.desmatamento d INNER JOIN ambiente.floresta f ON d.id_floresta = f.id " +
+                    "INNER JOIN ambiente.area_geografica ag ON f.id_area_geografica = ag.id " +
+                    "INNER JOIN ambiente.municipio m ON ag.id_municipio = m.id WHERE LOWER(m.nome) = ? " +
+                    "ORDER BY f.ano;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+
+            statement.setString(1, cityName.toLowerCase());
+
+            ResultSet results = statement.executeQuery();
+            List<DeforestationDataDTO> deforestation = new ArrayList<>();
+
+            while (results.next()) {
+                DeforestationDataDTO e = new DeforestationDataDTO();
+
+                e.setDeforestation(results.getFloat(1));
+                e.setYear(results.getInt(2));
+                e.setCityName(results.getString(3));
+
+                deforestation.add(e);
+            }
+
+            return deforestation;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
