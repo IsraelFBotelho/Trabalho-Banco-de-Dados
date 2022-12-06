@@ -32,6 +32,26 @@ public class RelatoriosController implements Serializable {
     private String regiao;
     private String city = null;
     private List<String> cities;
+
+    private String cityDesmatado;
+
+    public String getCityDesmatado() {
+        return cityDesmatado;
+    }
+
+    public void setCityDesmatado(String cityDesmatado) {
+        this.cityDesmatado = cityDesmatado;
+    }
+
+    public List<String> getCitiesDemastado() {
+        return citiesDemastado;
+    }
+
+    public void setCitiesDemastado(List<String> citiesDemastado) {
+        this.citiesDemastado = citiesDemastado;
+    }
+
+    private List<String> citiesDemastado;
     private LineChartModel lineModel = new LineChartModel();
 
     public String getCity() {
@@ -66,8 +86,11 @@ public class RelatoriosController implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+        this.lineModel = new LineChartModel();
+        this.city = null;
+        this.cityDesmatado = null;
 
-        if (this.type.equals("C")) this.getAllCities();
+        if (this.type.equals("T")) this.getAllCities();
     }
 
     public List<String> getCities() {
@@ -102,9 +125,16 @@ public class RelatoriosController implements Serializable {
         } else this.lineModel = new LineChartModel();
     }
 
+    public void renderCityDesmatado() {
+        if (this.city != null) {
+            System.out.println("Generating graphics for city " + this.city);
+
+            this.createLineModelDesmatado();
+        } else this.lineModel = new LineChartModel();
+    }
+
     private void createLineModel() {
         ChartData data = new ChartData();
-        LineChartDataSet dataSet = new LineChartDataSet();
         LineChartDataSet dataSet2 = new LineChartDataSet();
         MedicaoClimaDAO weatherDao = new MedicaoClimaDAO(this.connection);
         List<TemperatureDataDTO> temperatureData = weatherDao.readTemperatureData(this.city);
@@ -117,12 +147,51 @@ public class RelatoriosController implements Serializable {
             maxAvgValues.add(e.getMaxAvg());
         }
 
-//        dataSet.setData(minAvgValues);
-//        dataSet.setLabel("Média mínima");
-//        // dataSet.setYaxisID("left-y-axis");
-//        dataSet.setFill(false);
-//        dataSet.setBorderColor("rgb(0, 255, 0)");
-//        dataSet.setTension(0.1);
+        dataSet2.setData(maxAvgValues);
+        dataSet2.setLabel("Média máxima");
+        dataSet2.setFill(false);
+        dataSet2.setBorderColor("rgb(255, 0, 0)");
+        dataSet2.setTension(0.1);
+
+
+        data.addChartDataSet(dataSet2);
+        data.setLabels(labels);
+        lineModel.setData(data);
+
+        LineChartOptions options = new LineChartOptions();
+
+        Title title = new Title();
+        title.setDisplay(true);
+        title.setText(this.city);
+        options.setTitle(title);
+
+        lineModel.setOptions(options);
+    }
+
+    private void createLineModelDesmatado() {
+
+        // Area Desmatada por ano
+
+        ChartData data = new ChartData();
+        LineChartDataSet dataSet = new LineChartDataSet();
+        LineChartDataSet dataSet2 = new LineChartDataSet();
+        MedicaoClimaDAO weatherDao = new MedicaoClimaDAO(this.connection);
+        List<TemperatureDataDTO> temperatureData = weatherDao.readTemperatureData(this.city);
+        List<Object> maxAvgValues = new ArrayList<>();
+        List<Object> teste = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        Months[] month = Months.values();
+
+        for (var e : temperatureData) {
+            labels.add(generateLabel(e.getYear(), month[e.getMonth() - 1].getValue()));
+            maxAvgValues.add(e.getMaxAvg());
+        }
+
+        teste.add(12);
+        teste.add(15);
+        teste.add(12);
+        teste.add(15);
+        dataSet.setData(teste);
 
         dataSet2.setData(maxAvgValues);
         dataSet2.setLabel("Média máxima");
@@ -145,53 +214,6 @@ public class RelatoriosController implements Serializable {
 
         lineModel.setOptions(options);
     }
-
-//    private void createLineModel() {
-//        ChartData data = new ChartData();
-//
-//        MedicaoClimaDAO weatherDao = new MedicaoClimaDAO(this.connection);
-//        List<TemperatureDataDTO> temperatureData = weatherDao.readTemperatureData(this.city);
-//
-//        LineChartDataSet dataSet = new LineChartDataSet();
-//        data.addChartDataSet(dataSet);
-//
-//        List<String> labels = new ArrayList<>();
-//        List<Object> maxAvgValues = new ArrayList<>();
-//        List<Object> minAvgValues = new ArrayList<>();
-//        Months[] month = Months.values();
-//
-//        for (var e : temperatureData) {
-//            labels.add(generateLabel(e.getYear(), month[e.getMonth() - 1].getValue()));
-//            maxAvgValues.add(e.getMaxAvg());
-//            minAvgValues.add(e.getMinAvg());
-//        }
-//
-//        dataSet.setData(maxAvgValues);
-//        dataSet.setFill(false);
-//        dataSet.setLabel("Média das temperaturas máximas");
-//        dataSet.setBorderColor("rgb(75, 192, 192)");
-//        dataSet.setTension(0.1);
-//
-//        dataSet.setData(minAvgValues);
-//        dataSet.setFill(false);
-//        dataSet.setLabel("Média das temperaturas mínimas");
-//        dataSet.setBorderColor("rgb(255, 192, 192)");
-//        dataSet.setTension(0.1);
-//
-//        data.setLabels(labels);
-//
-//        // Options
-//        LineChartOptions options = new LineChartOptions();
-//        Title title = new Title();
-//        title.setDisplay(true);
-//        title.setText(this.city);
-//        options.setTitle(title);
-//
-//        lineModel.setOptions(options);
-//        lineModel.setData(data);
-//
-//        System.out.println("Generated graphics for city " + this.city);
-//    }
 
     private String generateLabel(int year, String monthName) {
         return monthName + " - " + year;

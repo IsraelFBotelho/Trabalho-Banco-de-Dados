@@ -95,7 +95,8 @@ public class MedicaoClimaDAO implements DAO<MedicaoClima> {
                     "ON em.id_municipio = m.id " +
                     "WHERE em.id_municipio = (" +
                     "SELECT id_municipio FROM ambiente.estacao_metereologica WHERE LOWER(nome) = ?) " +
-                    "GROUP BY em.id_municipio, m.nome, EXTRACT(YEAR FROM mc.data), EXTRACT(MONTH FROM mc.data);";
+                    "GROUP BY em.id_municipio, m.nome, EXTRACT(YEAR FROM mc.data), EXTRACT(MONTH FROM mc.data)" +
+                    "ORDER BY EXTRACT(YEAR FROM mc.data), EXTRACT(MONTH FROM mc.data);";
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             statement.setString(1, cityName.toLowerCase());
