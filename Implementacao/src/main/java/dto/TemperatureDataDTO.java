@@ -9,6 +9,7 @@ public class TemperatureDataDTO {
     private float max;
     private float minAvg;
     private float min;
+    public static float higherTemperature = 0;
 
     public int getYear() {
         return year;
@@ -56,6 +57,9 @@ public class TemperatureDataDTO {
 
     public void setMax(float max) {
         this.max = max;
+
+        if (max > higherTemperature)
+            higherTemperature = max;
     }
 
     public float getMinAvg() {

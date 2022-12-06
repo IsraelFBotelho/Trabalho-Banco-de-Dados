@@ -10,42 +10,55 @@
         <p:growl id="messages" showDetail="true"/>
 
         <div class="card">
-            <h1>UNDER DEVELOPMENT ;)</h1>
-            <h:form id="c">
-
+            <h:form id="c" style="margin-top: 10px">
+                <p:messages>
+                    <p:autoUpdate/>
+                </p:messages>
                 <p:menuButton value="Tipo de Gráfico">
-                    <!--                    <p:menuitem value="Cidade" action="#{relatoriosController.setTipo('C')}" update="c"-->
-                    <!--                                icon="pi pi-chart-line"/>-->
-
-                    <p:menuitem value="Cidade" action="#{relatoriosController.renderCity}" update="c"
+                    <p:menuitem value="Relação" action="#{relatoriosController.setType('R')}" update="c"
                                 icon="pi pi-chart-line"/>
-                    <p:menuitem value="Geral" action="#{relatoriosController.setTipo('G')}" update="c"
+                    <p:menuitem value="Temperatura" action="#{relatoriosController.setType('T')}" update="c"
                                 icon="pi pi-chart-line"/>
-                    Media das taxas de desmatamento no ano x media da terperatura maxima no ano
+                    <p:menuitem value="Desmatado" action="#{relatoriosController.setType('D')}" update="c"
+                                icon="pi pi-chart-line"/>
+                    Média das taxas de desmatamento no ano Vs. Média da temperatura máxima no ano
                 </p:menuButton>
 
-                <p:spacer width="1" height="22" rendered="#{relatoriosController.tipo eq 'C'}"
+                <p:spacer width="1" height="22"
+                          rendered="#{relatoriosController.type eq 'T' or relatoriosController.type eq 'D' or relatoriosController.type eq 'R'}"
                           style="position: relative; bottom: -5px;background-color: #A8A8A8; margin-left: 10px;margin-right: 10px"/>
 
-                <p:selectOneMenu id="option" value="#{relatoriosController.lastSelected}"
-                                 rendered="#{relatoriosController.tipo eq 'C'}">
+                <!--                TEMPERATURA-->
+                <p:selectOneMenu id="option_temperature" value="#{relatoriosController.temperatureCity}"
+                                 style="margin-bottom: 9px"
+                                 rendered="#{relatoriosController.type eq 'T' or relatoriosController.type eq 'R'}">
+                    <p:ajax event="change" update="chart_one" listener="#{relatoriosController.renderTemperature()}"/>
                     <f:selectItem itemLabel="Escolha uma cidade" itemValue=""/>
-                    <f:selectItems value="#{relatoriosController.cities}"/>
+                    <f:selectItems value="#{relatoriosController.temperatureCities}" var="city" itemValue="#{city}"/>
                 </p:selectOneMenu>
 
-                <p:button value="Gerar relatório" onclick="#{relatoriosController.handleChange()}" rendered="#{relatoriosController.tipo eq 'C'}"/>
+                <!--                DESMATAMENTO-->
+                <p:selectOneMenu id="option_deforestation" value="#{relatoriosController.deforestationCity}"
+                                 style="margin-bottom: 9px"
+                                 rendered="#{relatoriosController.type eq 'D' or relatoriosController.type eq 'R'}">
+                    <p:ajax event="change" update="chart_two" listener="#{relatoriosController.renderDeforestation()}"/>
+                    <f:selectItem itemLabel="Escolha uma cidade" itemValue=""/>
+                    <f:selectItems value="#{relatoriosController.deforestationCities}" var="city"
+                                   itemValue="#{city}"/>
+                </p:selectOneMenu>
 
                 <div class="card">
-                    <p:lineChart model="#{relatoriosController.lineModel}"
-                                 rendered="#{relatoriosController.tipo eq 'G'}" style="width: 100%; height: 500px;"/>
+                    <p:lineChart model="#{relatoriosController.lineModel}" id="chart_one"
+                                 rendered="#{relatoriosController.type eq 'T' or relatoriosController.type eq 'R'}"
+                                 style="width: 100%; height: 500px;"/>
                 </div>
 
                 <div class="card">
-                    <p:lineChart model="#{relatoriosController.lineModel}"
-                                 rendered="#{relatoriosController.tipo eq 'C'}" style="width: 100%; height: 500px;"/>
+                    <p:lineChart model="#{relatoriosController.lineModel2}" id="chart_two"
+                                 rendered="#{relatoriosController.type eq 'D' or relatoriosController.type eq 'R'}"
+                                 style="width: 100%; height: 500px;"/>
                 </div>
             </h:form>
         </div>
-
     </ui:define>
 </ui:composition>

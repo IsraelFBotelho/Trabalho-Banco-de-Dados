@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MunicipioDAO implements DAO<Municipio> {
@@ -27,9 +28,7 @@ public class MunicipioDAO implements DAO<Municipio> {
             PreparedStatement statement = connection.prepareStatement(SQL);
 
             for (Municipio e : models) {
-                Municipio ex = exist.stream().filter(
-                        (x) -> x.getNome().equals(e.getNome().toUpperCase())
-                                && x.getIdEstado() == e.getIdEstado()).findFirst().orElse(null);
+                Municipio ex = exist.stream().filter((x) -> x.getNome().equals(e.getNome().toUpperCase()) && x.getIdEstado() == e.getIdEstado()).findFirst().orElse(null);
 
                 if (ex == null) {
                     statement.setString(1, e.getNome().toUpperCase());
@@ -51,9 +50,7 @@ public class MunicipioDAO implements DAO<Municipio> {
         try {
             String SQL = "INSERT INTO ambiente.municipio (nome, id_estado) VALUES (?, ?);";
             PreparedStatement statement = connection.prepareStatement(SQL);
-            Municipio ex = exist.stream().filter(
-                    (x) -> x.getNome().equals(model.getNome().toUpperCase())
-                            && x.getIdEstado() == model.getIdEstado()).findFirst().orElse(null);
+            Municipio ex = exist.stream().filter((x) -> x.getNome().equals(model.getNome().toUpperCase()) && x.getIdEstado() == model.getIdEstado()).findFirst().orElse(null);
 
             if (ex == null) {
                 statement.setString(1, model.getNome().toUpperCase());
@@ -91,18 +88,65 @@ public class MunicipioDAO implements DAO<Municipio> {
         }
     }
 
-    public List<String> readCities() {
+    public List<String> readTemperatureCities() {
         try {
-            String SQL = "SELECT m.nome FROM ambiente.estacao_metereologica em " +
-                    "INNER JOIN ambiente.municipio m " +
-                    "ON em.id_municipio = m.id;";
+            String SQL = "SELECT DISTINCT m.nome FROM ambiente.medicao_clima mc " +
+                    "INNER JOIN ambiente.estacao_metereologica em ON mc.codigo_estacao_metereologica = em.codigo\n" +
+                    "INNER JOIN ambiente.municipio m ON em.id_municipio = m.id " +
+                    "ORDER BY m.nome;";
             PreparedStatement statement = connection.prepareStatement(SQL);
             ResultSet results = statement.executeQuery();
             List<String> cities = new ArrayList<>();
 
             while (results.next()) {
-                String nome = results.getString(1).toLowerCase();
-                cities.add(StringUtils.capitalize(nome));
+                String city = results.getString(1).toLowerCase();
+                cities.add(StringUtils.capitalize(city));
+            }
+
+            return cities;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> readDeforestationCities() {
+        try {
+            String SQL = "SELECT DISTINCT m.nome " +
+                    "FROM ambiente.desmatamento d " +
+                    "INNER JOIN ambiente.floresta f ON d.id_floresta = f.id " +
+                    "INNER JOIN ambiente.area_geografica ag ON f.id_area_geografica = ag.id " +
+                    "INNER JOIN ambiente.municipio m ON ag.id_municipio = m.id " +
+                    "ORDER BY m.nome;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            ResultSet results = statement.executeQuery();
+            List<String> cities = new ArrayList<>();
+
+            while (results.next()) {
+                String city = results.getString(1).toLowerCase();
+                cities.add(StringUtils.capitalize(city));
+            }
+
+            return cities;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> readRelatedCities() {
+        try {
+            String SQL = "SELECT DISTINCT m.nome FROM ambiente.desmatamento d " +
+                    "INNER JOIN ambiente.floresta f ON d.id_floresta = f.id " +
+                    "INNER JOIN ambiente.area_geografica ag ON f.id_area_geografica = ag.id " +
+                    "INNER JOIN ambiente.estacao_metereologica em ON ag.id_municipio = em.id_municipio " +
+                    "INNER JOIN ambiente.municipio m ON em.id_municipio = m.id " +
+                    "ORDER BY m.nome;";
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            ResultSet results = statement.executeQuery();
+            List<String> cities = new ArrayList<>();
+
+            while (results.next()) {
+                String city = results.getString(1).toLowerCase();
+                cities.add(StringUtils.capitalize(city));
             }
 
             return cities;
@@ -164,8 +208,7 @@ public class MunicipioDAO implements DAO<Municipio> {
 
             ResultSet results = statement.executeQuery();
 
-            if (results.next())
-                return results.getInt(1);
+            if (results.next()) return results.getInt(1);
 
             return -1;
         } catch (SQLException e) {
